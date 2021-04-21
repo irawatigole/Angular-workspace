@@ -7,8 +7,7 @@ export const environment = {
 };
 
 export const envConfig = {
-  apiDomain: 'https://sdkv2-uat.imaginationunwired.com:3001/',
-  mapApiKey: 'AIzaSyAVSqzLO91vvXvrJzb9l0dfradiAWccIYo'
+  apiDomain: 'https://sdkv2-uat.imaginationunwired.com:3001/'
 };
 /*
  * For easier debugging in development mode, you can import the following file
