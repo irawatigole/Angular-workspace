@@ -1,0 +1,151 @@
+<div class="split-container">
+    <div class="row m-t iu-row">
+      <div class="col-md-4 col-sm-6" style="padding-left: 0px;">
+        <div class="input-group iu-user-srch">
+          <!-- <form [formGroup]="contentForm">
+            <input type="text" formControlName="searchText" class="form-control" placeholder="Search By Name" />
+          </form> -->
+
+          <!-- <div class="input-group-btn">
+            <button type="button" class="btn">
+              <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+          </div> -->
+        </div>
+      </div>
+      <div class="col-md-8 col-sm-6">
+        <!-- <button type="button" class="btn btn-primary" (click)="createImageContent()">
+          Create Image Content
+        </button>
+        <button type="button" class="btn btn-primary" (click)="createVideoContent()">
+          Create Video Content
+        </button> -->
+        <div class="btn-group pull-right m-l">
+          <button *ngIf="canCreateImageFlag || canCreateVideoFlag" [disabled]="contentLoading" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span >New Content</span> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li *ngIf="canCreateImageFlag">
+              <a rel="button" (click)="createImageContent('NOTIFICATION')">
+                <i class="fa fa-bell" aria-hidden="true"></i> <span >NOTIFICATION</span>
+              </a>
+            </li>
+            <li *ngIf="canCreateImageFlag">
+              <a rel="button" (click)="createImageContent('RICHNOTIFICATION_BIG')">
+                <i class="fa fa-bell" aria-hidden="true"></i> <span >RICH NOTIFICATION LARGE</span>
+              </a>
+            </li>
+            <li *ngIf="canCreateImageFlag">
+              <a rel="button" (click)="createImageContent('MAIN')">
+                <i class="fa fa-picture-o" aria-hidden="true"></i> <span >PARTIAL</span>
+              </a>
+            </li>
+            <li *ngIf="canCreateImageFlag">
+              <a rel="button" (click)="createImageContent('FULL')">
+                <i class="fa fa-file-image-o" aria-hidden="true"></i> <span >FULL</span>
+              </a>
+            </li>
+            <li *ngIf="canCreateVideoFlag">
+              <a rel="button" (click)="createVideoContent()">
+                <i class="fa fa-video-camera" aria-hidden="true"></i> <span >VIDEO</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="activeRow !== null && (canEditImageFlag || canEditVideoFlag || canDeleteImageFlag || canDeleteVideoFlag || canDownloadImageFlag || canDownloadVideoFlag)" class="btn-group pull-right">
+          <button [disabled]="contentLoading" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span >Action</span> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li *ngIf="canEditImageFlag && activeRow.imageContentType !== 'VIDEO'">
+              <a rel="button" (click)="editContent()">
+                <i class="fas fa-pencil-alt-square" aria-hidden="true"></i> <span >EDIT</span>
+              </a>
+            </li>
+            <li *ngIf="(activeRow.imageContentType === 'VIDEO' && activeRow?.videoFileUrl && canDownloadVideoFlag) || (activeRow.imageContentType !== 'VIDEO' && canDownloadImageFlag)">
+              <a rel="button" (click)="downloadContent()">
+                <i class="fa fa-download" aria-hidden="true"></i> <span >DOWNLOAD</span>
+              </a>
+            </li>
+            <li *ngIf="canDeleteImageFlag || canDeleteVideoFlag">
+              <a rel="button" (click)="removeContent()">
+                <i class="fa fa-trash" aria-hidden="true"></i> <span >DELETE</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="brief-section" class="split split-horizontal">
+      <div class="row">
+        <div  class="col-md-12">
+          <lib-spinner>spinner</lib-spinner>
+        </div>
+        <div  class="col-md-12 iu-userlist-table">
+          <div class="table-responsive">
+            <iup-dimmer *ngIf="contentLoading"></iup-dimmer>
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="pointer">
+                    <span >Name</span>
+                    <i class="pull-right fa" [ngClass]="{'fa-sort': column != 'name', 'fa-sort-asc': (column == 'name' && isDesc), 'fa-sort-desc': (column == 'name' && !isDesc) }"
+                      aria-hidden="true"> </i>
+                  </th>
+                  <th class="pointer">
+                    <span >Type</span>
+                    <i class="pull-right fa" [ngClass]="{'fa-sort': column != 'imageContentType', 'fa-sort-asc': (column == 'imageContentType' && isDesc), 'fa-sort-desc': (column == 'imageContentType' && !isDesc) }"
+                      aria-hidden="true"> </i>
+                  </th>
+                  <th>
+                    <span >Size</span>
+                  </th>
+                  <th>
+                    <span >Dimension</span>
+                  </th>
+                  <th class="pointer">
+                    <span >Created</span>
+                    <i class="pull-right fa" [ngClass]="{'fa-sort': column != 'createdDate', 'fa-sort-asc': (column == 'createdDate' && isDesc), 'fa-sort-desc': (column == 'createdDate' && !isDesc) }"
+                      aria-hidden="true"> </i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let content of contentList; let i = index"
+                  (click)="rowToggle($event)" [attr.data-index]="content.id">
+                  <td>{{ content.name }}</td>
+                  <td>{{ (['RICHNOTIFICATION_BIG','MAIN'].indexOf(content.imageContentType) === -1) ? content.imageContentType : (content.imageContentType === 'MAIN') ? 'PARTIAL' : 'RICH NOTIFICATION LARGE'}}</td>
+                  <td>{{ (content.imageContentType === 'VIDEO' && content.externalVideoUrl !== null) ? '' : content.size | fileSize }}</td>
+                  <td>{{ (content.dimensions) ? content.dimensions.width + ' X ' + content.dimensions.height : '' }}</td>
+                  <td>{{ content.createdDate | date }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div *ngIf="isListEmpty" class="m-t" style="font-weight: 600; width: 80%; margin-left: 10%;">
+          <div class="alert alert-warning text-center" role="alert">
+            <span aria-hidden="true" class="glyphicon glyphicon glyphicon-warning-sign"></span>
+            <span class="sr-only">Error:</span>
+            <span >Content not available for listing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gutter gutter-mask" style="width: 20px;"></div>
+
+    <div id="detail-section" class="split split-horizontal">
+      <div *ngIf="contentLoading" class="row">
+        <div class="col-lg-12">
+          <iup-spinner></iup-spinner>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+

@@ -1,0 +1,125 @@
+<div class="split-container">
+    <div class="row m-t iu-row" *ngIf="isListEmpty">
+        <div class="col-md-4 col-sm-4">
+        </div>
+        <div class="col-md-offset-4 col-md-4 col-sm-4">
+          <a *ngIf="canCreate" rel="button" class="btn iu-btn btn-primary pull-right iu-btn-invite m-l" (click)="addCluster()">New Cluster</a>
+        </div>
+    </div>
+
+    <div class="row m-t iu-row" [class.hide]="isListEmpty">
+
+      <div class="col-md-offset-4 col-md-4 col-sm-4">
+          <a *ngIf="canCreate" rel="button" class="btn iu-btn btn-primary pull-right iu-btn-invite m-l" (click)="addCluster()">New Cluster</a>
+          <div *ngIf="activeRowDetails" class="btn-group pull-right">
+              <button *ngIf="canRename || canEdit || canClone || canDelete" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span>Action</span> <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li *ngIf="canRename">
+                  <a rel="button" (click)="renameCluster($event)">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> <span>Rename</span>
+                  </a>
+                </li>
+                <li *ngIf="canClone">
+                  <a rel="button" (click)="duplicateCluster($event)">
+                    <i class="fa fa-clone" aria-hidden="true"></i> <span>Duplicate</span>
+                  </a>
+                </li>
+                <li *ngIf="canEdit && (activeRowDetails?.clusterType === 'RULE' || activeRowDetails?.clusterType === 'PERMISSION' || activeRowDetails?.clusterType === 'CAMPAIGN')">
+                  <a rel="button" (click)="editCluster()">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> <span>Edit</span>
+                  </a>
+                </li>
+                <li *ngIf="canDelete">
+                  <a rel="button" (click)="deleteCluster($event)">
+                    <i class="fa fa-trash-o" aria-hidden="true"></i> <span>Delete</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="brief-section" class="split split-vertical">
+      <div class="row">
+        <div *ngIf="clusterListLoading" class="col-md-12">
+          <iup-spinner></iup-spinner>
+        </div>
+        <div *ngIf="!clusterListLoading && !isListEmpty" class="col-md-12 iu-userlist-table">
+          <div class="table-responsive">
+            <iup-dimmer *ngIf="activeRow != null && clusterDetailsLoading"></iup-dimmer>
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th class="pointer w-40" (click)="sort('name')">
+                    <span>Name</span>
+                    <i class="pull-right fa"
+                     [ngClass]="{'fa-sort': column != 'name', 'fa-sort-asc': (column == 'name' && isDesc), 'fa-sort-desc': (column == 'name' && !isDesc) }"
+                     aria-hidden="true"> </i>
+                  </th>
+                  <!-- <th class="pointer" (click)="sort('reachCount')">
+                    <span>Reach</span>
+                    <i class="pull-right fa"
+                    [ngClass]="{'fa-sort': column != 'reachCount', 'fa-sort-asc': (column == 'reachCount' && isDesc), 'fa-sort-desc': (column == 'reachCount' && !isDesc) }"
+                    aria-hidden="true"> </i>
+                  </th>
+                  <th class="pointer" (click)="sort('characteristic')">
+                    <span>Characteristic</span>
+                    <i class="pull-right fa"
+                    [ngClass]="{'fa-sort': column != 'characteristic', 'fa-sort-asc': (column == 'characteristic' && isDesc), 'fa-sort-desc': (column == 'characteristic' && !isDesc) }"
+                    aria-hidden="true"> </i>
+                  </th> -->
+                  <!-- <th class="pointer" (click)="sort('attributeCount')">
+                    No Attributes
+                    <i class="pull-right fa"
+                    [ngClass]="{'fa-sort': column != 'attributeCount', 'fa-sort-asc': (column == 'attributeCount' && isDesc), 'fa-sort-desc': (column == 'attributeCount' && !isDesc) }"
+                    aria-hidden="true"> </i>
+                  </th>   -->
+                  <!-- <th class="pointer" (click)="sort('usageCount')">
+                    <span>Usage</span>
+                    <i class="pull-right fa"
+                    [ngClass]="{'fa-sort': column != 'usageCount', 'fa-sort-asc': (column == 'usageCount' && isDesc), 'fa-sort-desc': (column == 'usageCount' && !isDesc) }"
+                    aria-hidden="true"> </i>
+                  </th>   -->
+                  <th class="pointer" (click)="sort('createdAt')">
+                    <span>Created On</span>
+                    <i class="pull-right fa"
+                    [ngClass]="{'fa-sort': column != 'createdAt', 'fa-sort-asc': (column == 'createdAt' && isDesc), 'fa-sort-desc': (column == 'createdAt' && !isDesc) }"
+                    aria-hidden="true"> </i>
+                  </th>
+
+                  <th class="pointer" (click)="sort('userName')">
+                      <span>Creator</span>
+                      <i class="pull-right fa"
+                      [ngClass]="{'fa-sort': column != 'userName', 'fa-sort-asc': (column == 'userName' && isDesc), 'fa-sort-desc': (column == 'userName' && !isDesc) }"
+                      aria-hidden="true"> </i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let cluster of clusterList | clusterSearch: searchText | orderBy: {property: column, direction: direction}; let i = index"  (click)="rowToggle($event)" [attr.data-index]="cluster.id">
+                  <td>{{ cluster.name | capitalize }}</td>
+                  <!-- <td>{{ cluster.reachCount }}</td>
+                  <td>{{ cluster.characteristics }}</td> -->
+                  <!-- <td>{{ cluster.attributeCount }}</td> -->
+                  <!-- <td>{{ cluster.usageCount }}</td> -->
+                  <td>{{ (cluster.createdAt * 1000) | date:'medium' }}</td>
+                  <td>{{ cluster.userName }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div *ngIf="isListEmpty" class="m-t" style="font-weight: 600; width: 80%; margin-left: 10%;">
+          <div class="alert alert-warning text-center" role="alert">
+            <span aria-hidden="true" class="glyphicon glyphicon glyphicon-warning-sign"></span>
+            <span class="sr-only">Error:</span>
+            <span>Audience Cluster not available for listing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+

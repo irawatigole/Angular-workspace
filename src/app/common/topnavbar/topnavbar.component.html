@@ -1,0 +1,97 @@
+<div class="row border-bottom">
+    <nav id="navbar" class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+      <div class="navbar-header">
+        <a class="minimalize-styl-2 btn btn-primary " (click)="toggleNavigation()"><i class="fa fa-bars"></i> </a>
+      </div>
+      <div class="title" [ngSwitch]="activeRoute">
+        <h2 *ngSwitchCase="'dashboard'" >DASHBOARD</h2>
+        <h2 *ngSwitchCase="'user/management'" >USER MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'campaign/new'" >CREATE CAMPAIGN</h2>
+        <h2 *ngSwitchCase="'campaign/objective'" >CREATE CAMPAIGN</h2>
+        <h2 *ngSwitchCase="'campaign/analysis'" >CAMPAIGN ANALYSIS</h2>
+        <h2 *ngSwitchCase="'audience/analysis'" >AUDIENCE ANALYSIS</h2>
+        <h2 *ngSwitchCase="'invite-user'" >INVITE USER</h2>
+        <h2 *ngSwitchCase="'invite-user;e='" >UPDATE USER ROLE</h2>
+        <h2 *ngSwitchCase="'cluster/manage'" >CLUSTER MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'cluster/new'" >CREATE CLUSTER</h2>
+        <h2 *ngSwitchCase="'campaign/manage'" >CAMPAIGN MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'campaign/edit'" >EDIT CAMPAIGN</h2>
+        <h2 *ngSwitchCase="'user/profile'" >USER PROFILE</h2>
+        <h2 *ngSwitchCase="'organization/settings'" >ORGANIZATION SETTINGS</h2>
+        <h2 *ngSwitchCase="'report/settings'" >REPORT SETTINGS</h2>
+        <h2 *ngSwitchCase="'report/automated'" >COMPLETED CAMPAIGNS</h2>
+        <h2 *ngSwitchCase="'report/manage'" >REPORT MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'organization/manage'" >ORGANIZATION </h2>
+        <h2 *ngSwitchCase="'organization/new'" >NEW ORGANIZATION</h2>
+        <h2 *ngSwitchCase="'organization/edit'" >EDIT ORGANIZATION</h2>
+        <h2 *ngSwitchCase="'support'" >SUPPORT</h2>
+        <h2 *ngSwitchCase="'news'" >WHAT'S NEW</h2>
+        <h2 *ngSwitchCase="'agency/manage'" >AGENCY MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'advertiser/manage'" >ADVERTISER MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'content/manage'" >CONTENT MANAGEMENT</h2>
+        <h2 *ngSwitchCase="['preload/profile','preload/app','preload/device','preload/channel'].includes(activeRoute) ? activeRoute : ''" >OUT OF BOX PRELOAD</h2>
+        <h2 *ngSwitchCase="'preload/analysis'" >PRELOAD ANALYTICS</h2>
+        <h2 *ngSwitchCase="'places/config/manage'" >PLACE CONFIG MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'places/activity-rule/manage'" >ACTIVITY RULES</h2>
+        <h2 *ngSwitchCase="'cluster/external'" >EXTERNAL AUDIENCE</h2>
+        <h2 *ngSwitchCase="'diagnostic/report'" >DIAGNOSTIC</h2>
+        <h2 *ngSwitchCase="'sync/data'" >SYNC DATA</h2>
+        <h2 *ngSwitchCase="'report/system-performance'" >PERFORMANCE REPORT</h2>
+        <h2 *ngSwitchCase="'category/manage'" >CATEGORY MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'survey/manage'">SURVEY MANAGEMENT</h2>
+        <h2 *ngSwitchCase="'survey/questions'">SURVEY QUESTIONS</h2>
+        <h2 *ngSwitchCase="'report/download'" >Download Reports</h2>
+        <h2 *ngSwitchDefault >Title</h2>
+      </div>
+      <ul class="nav navbar-top-links navbar-right">
+        <li>
+          <div>{{ currentDate }} [ {{ currentTimeZoneAbbr }} ] </div>
+        </li>
+        <!-- <li class="dropdown" appDropdown>
+          <a class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" >
+            Language
+          </a>
+          <ul class="animated fadeInRight m-t-xs ng-scope dropdown-menu">
+            <li><a (click)="changeLanguage('en-US')">English</a></li>
+            <li><a (click)="changeLanguage('es')">Spanish</a></li>
+          </ul>
+        </li> -->
+        <!-- <li>
+          <a (click)="logout()" >
+              <i class="fa fa-sign-out"></i> Log out
+          </a>
+        </li> -->
+
+        <li>
+          <a rel="button" (click)="openNav()"><i class="fa fa-user-circle"></i>{{ currentUser?.firstName }} <i class="fa fa-caret-left"></i></a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" (click)="closeNav()">&times;</a>
+    <p class="iu-item-name">{{ currentOrg?.name }}</p>
+    <div class="input-group">
+      <div class="input-group iu-user-srch">
+        <input class="form-control" placeholder="Search By Name" type="text" [(ngModel)]="searchText">
+        <div class="input-group-btn">
+          <button class="btn" type="button"><i aria-hidden="true" class="fa fa-search"></i></button>
+        </div>
+      </div>
+    </div>
+    <ul class="iu-side-nav">
+      <li>
+        <a *ngFor="let org of orgList" (click)="changeSessionByOrg(org)" [class.hide]="org.id === currentOrg.id">
+          <span>{{ org.name }}</span>
+        </a>
+      </li>
+      <li>
+        <hr />
+      </li>
+      <li>
+        <a (click)="logout()">
+          <i class="fa fa-sign-out"></i> <span >Log out</span>
+        </a>
+      </li>
+    </ul>
+  </div>

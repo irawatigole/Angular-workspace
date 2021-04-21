@@ -1,0 +1,23 @@
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+      <img src="/assets/img/iu-logo-blue-main.png" title="logo" alt="logo">
+    </div>
+    <p>{{ message }}</p>
+    <div class="form-group">
+      <h3>Select Organization</h3>
+      <select class="form-control" (change)="changeOrg($event)">
+        <option *ngFor="let org of orgList | async" value="{{ org.id }}">{{ org.name }}</option>
+      </select>
+      <div class="iu-slt-org-block">
+        <h4>Your role(s) for {{ selectedOrgName }} organization:</h4>
+        <ul>
+          <li *ngFor="let item of selectedRoles">{{ item.name }}</li>
+        </ul>
+      </div>
+      <button class="btn iu-btn btn-primary flex-right" (click)="selectOrg()" [disabled]="loading || initLoading" type="button">Continue</button>
+      <iup-loading *ngIf="loading"></iup-loading>
+      <div class="alert-error">
+        <div>{{ errorMessage }}</div>
+      </div>
+    </div>
+  </div>

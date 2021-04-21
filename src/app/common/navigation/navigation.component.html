@@ -1,0 +1,41 @@
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+      <ul class="nav metismenu" id="side-menu">
+        <li class="nav-header">
+          <div class="dropdown profile-element">
+            <a data-toggle="dropdown" class="dropdown-toggle text-center" href="#">
+              <img src="{{ orgLogoImagePath }}" class="img-responsive center-block"  alt="imagination-logo" title="logo">
+              <span class="block m-t-xs" style="color: white;"> <strong class="font-bold">{{ orgName }}</strong> </span>
+            </a>
+          </div>
+          <div class="logo-element">IU+</div>
+        </li>
+
+        <!-- Line BR -->
+
+        <hr class="m-t-0 m-b">
+        <li *ngIf="contentViewFlag" [ngClass]="{active: activeRoute('content/manage')}">
+          <a class="has-arrow" href="#"><i class="far fa-file-image"></i> <span>CONTENT</span> <span class="fa arrow"></span></a>
+          <ul class="nav nav-second-level collapse" [ngClass]="{in: activeRoute('content/manage')}">
+            <li [ngClass]="{active: activeRoute('content/manage')}"><a [routerLink]="['/content/manage']" >Content Mgmt</a></li>
+          </ul>
+        </li>
+
+        <li *ngIf="clusterManageFlag || newClusterFlag" [ngClass]="{active: activeRoute('cluster/manage') || activeRoute('cluster/external')}">
+          <a class="has-arrow" href="#"><i class="fas fa-users"></i> <span>AUDIENCE</span> <span class="fa arrow"></span></a>
+          <ul class="nav nav-second-level collapse" [ngClass]="{in: activeRoute('cluster/manage') || activeRoute('cluster/external')}">
+            <li *ngIf="clusterManageFlag" [ngClass]="{active: activeRoute('cluster/manage')}"><a [routerLink]="['/cluster/manage']" >Cluster Mgmt</a></li>
+            <li *ngIf="clusterManageFlag" [ngClass]="{active: activeRoute('cluster/external')}"><a [routerLink]="['/cluster/external']" >External Audience</a></li>
+          </ul>
+        </li>
+
+        <li *ngIf="contentViewFlag" [ngClass]="{active: activeRoute('app1/one')}">
+          <a class="has-arrow" href="#"><i class="far fa-file-image"></i> <span>Application Management</span> <span class="fa arrow"></span></a>
+          <ul class="nav nav-second-level collapse" [ngClass]="{in: activeRoute('app1/one')}">
+            <li [ngClass]="{active: activeRoute('app1/one')}"><a [routerLink]="['/app1']" >App1</a></li>
+          </ul>
+        </li>
+      </ul>
+      <hr>
+    </div>
+  </nav>
