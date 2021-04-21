@@ -18,6 +18,11 @@ export class ApiBaseService {
     if (headers == null) {
       headers = this.getHeaders();
     }
+    headers.append(
+      'token',
+      this.cookieService.getCookie('t')
+      // JSON.parse(localStorage.getItem('iup'))['data']['token']
+    );
     return this.httpClient.get<Observable<any>>(this.buildApiURL(uriPath), { headers }).pipe(
       catchError((error: Response) => throwError(error))
     );
@@ -77,11 +82,13 @@ export class ApiBaseService {
   }
 
   private setSessionToken(headers: HttpHeaders): HttpHeaders {
-    headers.append(
-      'token',
-      'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1YTI5NTBhMDk5M2M4ZjE1NzBjMjU1MTEiLCJlbWFpbCI6ImFkbWluQGl1LmNvbSIsIm9yZ2FuaXphdGlvbklkIjoiNWEyOTRmODE5OTNjOGYxNTcwYzI1NTBkIiwicm9sZXMiOlt7Im5hbWUiOiJBZG1pbmlzdHJhdG9yIiwiaWQiOiI1OWE5MTJjNTQ2ZTBmYjAwMDE3Y2Y5MWEiLCJzaG9ydF9jb2RlIjoiU0EifV0sImNyZWF0ZWRBdCI6IjE2MTg5OTU3NTc2MTIifQ.ay4-fR66rJUHCBkxY4_Y_bDMUZyENvVCs4wkCT409hbcgjkWC4zEVX_wnfIquInvePXklKwyVT3skmcv4dxNgA'
-      // JSON.parse(localStorage.getItem('iup'))['data']['token']
-    );
+    if (localStorage.getItem('iup') && this.cookieService.getCookie('t') !== null) {
+      headers.append(
+        'token',
+        this.cookieService.getCookie('t')
+        // JSON.parse(localStorage.getItem('iup'))['data']['token']
+      );
+    }
     return headers;
   }
 }

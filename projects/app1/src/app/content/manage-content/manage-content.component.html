@@ -117,7 +117,7 @@
                   (click)="rowToggle($event)" [attr.data-index]="content.id">
                   <td>{{ content.name }}</td>
                   <td>{{ (['RICHNOTIFICATION_BIG','MAIN'].indexOf(content.imageContentType) === -1) ? content.imageContentType : (content.imageContentType === 'MAIN') ? 'PARTIAL' : 'RICH NOTIFICATION LARGE'}}</td>
-                  <td>{{ (content.imageContentType === 'VIDEO' && content.externalVideoUrl !== null) ? '' : content.size | fileSize }}</td>
+                  <td>{{ (content.imageContentType === 'VIDEO' && content.externalVideoUrl !== null) ? '' : content.size  }}</td>
                   <td>{{ (content.dimensions) ? content.dimensions.width + ' X ' + content.dimensions.height : '' }}</td>
                   <td>{{ content.createdDate | date }}</td>
                 </tr>
