@@ -14,7 +14,7 @@ import { isoIsdCodes } from '../../../../../../src/isd-codes';
 declare var jQuery: any;
 
 @Component({
-  selector: 'iup-audience-cluster-modal',
+  selector: 'lib-audience-cluster-modal',
   templateUrl: './audience-cluster-modal.component.html',
   styleUrls: ['./audience-cluster-modal.component.scss']
 })
