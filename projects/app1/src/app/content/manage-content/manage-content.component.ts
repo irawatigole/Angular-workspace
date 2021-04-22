@@ -54,6 +54,9 @@ export class ManageContentComponent implements OnInit {
     private contentService: ContentService,
     private titleService: Title
   ) {
+    this.permissions = JSON.parse(localStorage.getItem('iup') || '{}')?.data?.permissions;
+    this.orgId = JSON.parse(localStorage.getItem('iup') || '{}')?.data?.organization?.id;
+    // this.getOrgSettings();
     this.contentService.getAllImageContentByOrganization('5a294f81993c8f1570c2550d').subscribe((res) => {
       this.contentService.getAllVideoContentByOrganization('5a294f81993c8f1570c2550d').subscribe((resp) => {
         const videoContentList = resp?.data?.map((video: any) => {
@@ -80,5 +83,17 @@ export class ManageContentComponent implements OnInit {
   ngOnInit(): void {
     this.titleService.setTitle('Content Management');
   }
+
+  // getOrgSettings(): void {
+  //   const organizationId = JSON.parse(localStorage.getItem('iup') || '{}')?.data?.organization?.id;
+  //   this.orgService.getOrganizationById(organizationId)
+  //     .subscribe((res) => {
+  //       this.orgSettings = res.data;
+  //       this.setMaxImageUploadSize();
+  //       this.setMaxVideoUploadSize();
+  //     }, (errors) => {
+  //       console.log(getErrorMessage(errors));
+  //     });
+  // }
 
 }

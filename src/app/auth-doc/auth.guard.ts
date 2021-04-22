@@ -9,7 +9,6 @@ export class AuthGuard implements CanActivate {
   permissions: any;
 
   constructor(private router: Router) {
-    console.log('hi')
     this.setPermission();
   }
 
@@ -22,7 +21,6 @@ export class AuthGuard implements CanActivate {
         this.setPermission();
       }
       const hasPermission = this.checkACL(state.url);
-      console.log(hasPermission)
       if (! hasPermission) {
         this.router.navigate(['/content/manage']);
         return false;

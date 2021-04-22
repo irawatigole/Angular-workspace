@@ -7,12 +7,13 @@ import { BasicComponent } from './basic.component';
 
 import { NavigationModule } from '../navigation/navigation.module';
 import { FooterModule } from '../footer/footer.module';
-
+import { TopnavbarModule } from '../topnavbar/topnavbar.module';
 
 @NgModule({
   declarations: [BlankComponent, BasicComponent],
   imports: [
-    CommonModule, RouterModule, NavigationModule, FooterModule
+    CommonModule, RouterModule, NavigationModule, FooterModule,
+    TopnavbarModule
   ],
   exports: [BlankComponent, BasicComponent]
 })
