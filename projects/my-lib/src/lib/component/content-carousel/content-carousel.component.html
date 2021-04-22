@@ -1,0 +1,797 @@
+<div *ngIf="campaign.notification" [attr.id]="carouselRefId + 'ContentCarousel'" class="carousel" data-interval="false"
+  data-wrap="false">
+  <!-- Wrapper for slides -->
+  <div class="carousel-inner" *ngIf="isNotificationOnlyCarousel() || isPartialOnlyCarousel() || isFullOnlyCarousel()">
+
+    <div *ngIf="isPartialOnlyCarousel() && enableSection.main" class="item" [class.active]="isPartialOnlyCarousel()">
+      <div class="item-col">
+        <div class="item-col-content item-col-main">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video id="video-selected-content" title="click to play or pause"
+            controlsList="nodownload nofullscreen noremoteplayback" *ngIf="isSelectedVideoPlaying"
+            [hidden]="!videoCanPlay" (ended)="videoEnded()" (click)="playAndPause($event)"
+            (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img class="main-img" title="Main" *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)"
+            src="{{ campaign?.mainImageContent?.imageUrl }}" />
+
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec"
+            [class.second-partial]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Partial</p>
+    </div>
+
+
+    <div *ngIf="isFullOnlyCarousel() &&  enableSection.full" class="item" [class.active]="isFullOnlyCarousel()">
+      <div class="item-col">
+        <div class="item-col-content item-col-full">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video *ngIf="isSelectedVideoPlaying" title="click to play or pause" [hidden]="!videoCanPlay"
+            id="video-selected-content" controlsList="nodownload nofullscreen noremoteplayback" (ended)="videoEnded()"
+            (click)="playAndPause($event)" (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)" [class.mar-t40p]="!isFullImageProperRatio"
+            src="{{ campaign?.fullImageContent?.imageUrl }}" title="Full">
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec" [class.second]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Full</p>
+    </div>
+
+    <div *ngIf="isNotificationOnlyCarousel() && enableSection.notification" class="item"
+      [class.active]="isNotificationOnlyCarousel()">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix">
+          <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+          <p class="iu-noti-text">{{ subjectMsg }}
+            <span>{{ textMsg }}</span>
+          </p>
+        </div>
+      </div>
+      <p>Notification</p>
+    </div>
+
+
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+  <div class="carousel-inner" *ngIf="isFullWithNotificationCarousel()">
+    <div *ngIf="enableSection.notification" class="item" [class.active]="(!enableSection.notification && enableSection.full)
+    || (enableSection.notification && enableSection.full)">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix">
+          <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+          <p class="iu-noti-text">{{ subjectMsg }}
+            <span>{{ textMsg }}</span>
+          </p>
+        </div>
+      </div>
+      <p>Notification</p>
+    </div>
+
+    <div *ngIf="enableSection.full" class="item" [class.active]="(enableSection.notification && !enableSection.full)">
+      <div class="item-col">
+        <div class="item-col-content item-col-full">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video *ngIf="isSelectedVideoPlaying" title="click to play or pause" [hidden]="!videoCanPlay"
+            id="video-selected-content" controlsList="nodownload nofullscreen noremoteplayback" (ended)="videoEnded()"
+            (click)="playAndPause($event)" (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)" [class.mar-t40p]="!isFullImageProperRatio"
+            src="{{ campaign?.fullImageContent?.imageUrl }}" title="Full">
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec" [class.second]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Full</p>
+    </div>
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+
+  <div class="carousel-inner" *ngIf="isPartialWithNotificationCarousel()">
+
+    <div *ngIf="enableSection.main" class="item" [class.active]="(!enableSection.notification && enableSection.main)
+        || (enableSection.notification && enableSection.main)">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix">
+          <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+          <p class="iu-noti-text">{{ subjectMsg }}
+            <span>{{ textMsg }}</span>
+          </p>
+        </div>
+      </div>
+      <p>Notification</p>
+    </div>
+
+
+    <div *ngIf="enableSection.notification" class="item"
+      [class.active]="(enableSection.notification && !enableSection.main)">
+      <div class="item-col">
+        <div class="item-col-content item-col-main">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video id="video-selected-content" title="click to play or pause"
+            controlsList="nodownload nofullscreen noremoteplayback" *ngIf="isSelectedVideoPlaying"
+            [hidden]="!videoCanPlay" (ended)="videoEnded()" (click)="playAndPause($event)"
+            (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img class="main-img" title="Main" *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)"
+            src="{{ campaign?.mainImageContent?.imageUrl }}" />
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec"
+            [class.second-partial]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Partial</p>
+    </div>
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+  <div class="carousel-inner" *ngIf="isRichNotificationTextCompactCarousel() || isRichNotificationTextExpandCarousel()">
+
+    <div *ngIf="isRichNotificationTextCompactCarousel()" class="item" [class.active]="(!isRichNotificationTextExpandCarousel() && isRichNotificationTextCompactCarousel())
+      || (isRichNotificationTextCompactCarousel() && isRichNotificationTextExpandCarousel())">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify">
+          <p class="iu-noti-text-removed">
+            <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+            <span style="font-weight: bold;">{{ subjectMsg }}</span>
+            <span>{{ textMsg }}</span>
+          </p>
+          <!-- <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">{{ campaign?.notification?.richNotificationActionButtonText }}</div> -->
+        </div>
+      </div>
+      <p>Notification Compact</p>
+    </div>
+
+    <div *ngIf="isRichNotificationTextExpandCarousel()" class="item"
+      [class.active]="(isRichNotificationTextExpandCarousel() && !isRichNotificationTextCompactCarousel())">
+      <div class="item-col">
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify iu-noti-text-full">
+          <p [ngClass]="isShowRichNotificationActionButtonText() ? 'iu-noti-text' : 'iu-noti-text-removed'">
+            <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+            <span style="font-weight: bold;">{{ subjectMsg }}</span>
+            <span>
+              {{ campaign?.notification?.richNotificationMessageBody }}
+            </span>
+          </p>
+          <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">
+            {{ campaign?.notification?.richNotificationActionButtonText }}</div>
+        </div>
+      </div>
+      <p>Notification Expand</p>
+    </div>
+
+    <div *ngIf="enableSection.main" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-main">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video id="video-selected-content" title="click to play or pause"
+            controlsList="nodownload nofullscreen noremoteplayback" *ngIf="isSelectedVideoPlaying"
+            [hidden]="!videoCanPlay" (ended)="videoEnded()" (click)="playAndPause($event)"
+            (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img class="main-img" title="Main" *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)"
+            src="{{ campaign?.mainImageContent?.imageUrl }}" />
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec"
+            [class.second-partial]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Partial</p>
+    </div>
+
+    <div *ngIf="enableSection.full" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-full">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video *ngIf="isSelectedVideoPlaying" title="click to play or pause" [hidden]="!videoCanPlay"
+            id="video-selected-content" controlsList="nodownload nofullscreen noremoteplayback" (ended)="videoEnded()"
+            (click)="playAndPause($event)" (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)" [class.mar-t40p]="!isFullImageProperRatio"
+            src="{{ campaign?.fullImageContent?.imageUrl }}" title="Full">
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec" [class.second]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Full</p>
+    </div>
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+  <div class="carousel-inner"
+    *ngIf="isRichNotificationImageCompactCarousel() || isRichNotificationImageExpandCarousel()">
+
+    <div *ngIf="isRichNotificationImageCompactCarousel()" class="item" [class.active]="(!isRichNotificationImageExpandCarousel() && isRichNotificationImageCompactCarousel())
+      || (isRichNotificationImageCompactCarousel() && isRichNotificationImageExpandCarousel())">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify">
+          <p class="iu-noti-text-removed">
+            <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+            <span style="font-weight: bold;">{{ subjectMsg }}</span>
+            <span>{{ textMsg }}</span>
+          </p>
+          <!-- <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">{{ campaign?.notification?.richNotificationActionButtonText }}</div> -->
+        </div>
+      </div>
+      <p>Notification Compact</p>
+    </div>
+
+    <div *ngIf="isRichNotificationImageExpandCarousel()" class="item"
+      [class.active]="(isRichNotificationImageExpandCarousel() && !isRichNotificationImageCompactCarousel())">
+      <div class="item-col">
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify rich-bigimg">
+          <p class="iu-noti-text">
+            <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+            <span style="font-weight: bold;">{{ subjectMsg }}</span>
+            <span>{{ textMsg }}</span>
+          </p>
+          <img src="{{ campaign?.notification?.richNotificationLargeImageContent?.imageUrl }}"
+            title="Rich Notification Large Image"
+            [ngClass]="isShowRichNotificationActionButtonText() ? 'rich-noti-bimg' : 'rich-noti-bimg-removed'">
+          <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">
+            {{ campaign?.notification?.richNotificationActionButtonText }}</div>
+        </div>
+      </div>
+      <p>Notification Expand</p>
+    </div>
+
+    <div *ngIf="enableSection.main" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-main">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video id="video-selected-content" title="click to play or pause"
+            controlsList="nodownload nofullscreen noremoteplayback" *ngIf="isSelectedVideoPlaying"
+            [hidden]="!videoCanPlay" (ended)="videoEnded()" (click)="playAndPause($event)"
+            (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img class="main-img" title="Main" *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)"
+            src="{{ campaign?.mainImageContent?.imageUrl }}" />
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec"
+            [class.second-partial]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Partial</p>
+    </div>
+
+    <div *ngIf="enableSection.full" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-full">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video *ngIf="isSelectedVideoPlaying" title="click to play or pause" [hidden]="!videoCanPlay"
+            id="video-selected-content" controlsList="nodownload nofullscreen noremoteplayback" (ended)="videoEnded()"
+            (click)="playAndPause($event)" (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)" [class.mar-t40p]="!isFullImageProperRatio"
+            src="{{ campaign?.fullImageContent?.imageUrl }}" title="Full">
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec" [class.second]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Full</p>
+    </div>
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+  <div class="carousel-inner"
+    *ngIf="isRichNotificationCustomCompactCarousel() || isRichNotificationCustomExpandCarousel()">
+
+    <div *ngIf="isRichNotificationCustomCompactCarousel()" class="item" [class.active]="(!isRichNotificationCustomExpandCarousel() && isRichNotificationCustomCompactCarousel())
+      || (isRichNotificationCustomCompactCarousel() && isRichNotificationCustomExpandCarousel())">
+      <div class="item-col">
+        <div class="item-col-time">{{ clockTime }}</div>
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify notify-bgimage"
+          [ngStyle]="{'background-image': 'url(\'' + campaign?.notification?.richNotificationTheme?.backgroundImageUrl +'\')'}">
+          <img src="{{ campaign?.notificationImageContent?.imageUrl }}" title="Notification" class="noti-img">
+          <p [ngStyle]="{'color': campaign?.notification?.richNotificationTheme?.titleColor, 'font-size': '13px', 'line-height': '16px', 'width': '138px'}"
+            class="iu-noti-text-removed">
+            <span style="font-weight: bold;">{{ subjectMsg }}</span>
+            <span [ngStyle]="{'color': campaign?.notification?.richNotificationTheme?.textColor }">{{ textMsg }}</span>
+          </p>
+          <!-- <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">{{ campaign?.notification?.richNotificationActionButtonText }}</div> -->
+        </div>
+      </div>
+      <p>Notification Compact</p>
+    </div>
+
+    <div *ngIf="isRichNotificationCustomExpandCarousel()" class="item"
+      [class.active]="(isRichNotificationCustomExpandCarousel() && !isRichNotificationCustomCompactCarousel())">
+      <div class="item-col">
+        <div class="item-col-content item-col-notify clearfix iu-rich-notify rich-bigimg">
+          <img src="{{ campaign?.notification?.richNotificationLargeImageContent?.imageUrl }}"
+            title="Rich Notification Large Image"
+            [ngClass]="isShowRichNotificationActionButtonText() ? 'rich-noti-bimg' : 'rich-noti-bimg-removed'">
+          <div *ngIf="isShowRichNotificationActionButtonText()" class="iu-rich-lnk">
+            {{ campaign?.notification?.richNotificationActionButtonText }}</div>
+        </div>
+      </div>
+      <p>Notification Expand</p>
+    </div>
+
+    <div *ngIf="enableSection.main" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-main">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video id="video-selected-content" title="click to play or pause"
+            controlsList="nodownload nofullscreen noremoteplayback" *ngIf="isSelectedVideoPlaying"
+            [hidden]="!videoCanPlay" (ended)="videoEnded()" (click)="playAndPause($event)"
+            (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img class="main-img" title="Main" *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)"
+            src="{{ campaign?.mainImageContent?.imageUrl }}" />
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec"
+            [class.second-partial]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}</span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Partial</p>
+    </div>
+
+    <div *ngIf="enableSection.full" class="item">
+      <div class="item-col">
+        <div class="item-col-content item-col-full">
+          <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+          <iup-spinner *ngIf="((isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo &&
+          campaign?.videoContentFlag === true)"></iup-spinner>
+          <video *ngIf="isSelectedVideoPlaying" title="click to play or pause" [hidden]="!videoCanPlay"
+            id="video-selected-content" controlsList="nodownload nofullscreen noremoteplayback" (ended)="videoEnded()"
+            (click)="playAndPause($event)" (canplay)="videoIsLoaded($event)">
+            <source src="{{ selectedVideoContentUrl }}" type="video/mp4">
+          </video>
+          <img class="gif" src="{{ campaign?.videoContent?.videoFileUrl }}" *ngIf="campaign?.videoContentFlag === false && isGifPlaying
+          && campaign?.videoContent?.gifFileId  !== null" />
+          <img *ngIf="(campaign?.videoContentFlag === true && !isSelectedVideoPlaying)
+          || (campaign?.videoContentFlag === false && !isGifPlaying)" [class.mar-t40p]="!isFullImageProperRatio"
+            src="{{ campaign?.fullImageContent?.imageUrl }}" title="Full">
+          <div id="modilfy-height" class="iu-shw-pnl iu-gear iu-btm-like-sec" [class.second]="isSelectedVideoPlaying">
+            <div>
+              <a class="iu-like-icon" *ngIf="campaign?.showPositiveFeedback"><i class="fa fa-thumbs-o-up"
+                  aria-hidden="true"></i></a>
+              <a class="iu-dislike-icon" *ngIf="campaign?.showNegativeFeedback"><i class="fa fa-thumbs-o-down"
+                  aria-hidden="true"></i></a>
+            </div>
+            <span>{{ (campaign.vasInfo && campaign.vasInfo.providerId !== null)
+              ? campaign.vasInfo.preSubscriptionActionText : actionLabel }}
+            </span>
+            <a class="iu-gear-icon"><i class="fa fa-gear" aria-hidden="true"></i></a>
+          </div>
+          <div *ngIf="(videoContent !== '' || videoContent !== null) && (isVideoContentSelected == true && isSelectedVideoPlaying == false)
+            && campaign?.videoContentFlag === true" class="iu-video-icon">
+            <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+          <div class="iu-video-icon"
+            *ngIf="!isGifPlaying && campaign?.videoContentFlag === false && campaign?.videoContent?.gifFileId !== null">
+            <a (click)="toggleGifImage()">
+              <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <p>Full</p>
+    </div>
+
+    <ng-container *ngTemplateOutlet="vasCarouselItems"></ng-container>
+    <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+
+  </div>
+
+  <div class="carousel-inner" *ngIf="isSurveyWithInterstitialWithoutImage()">
+    <div *ngIf="isSurveyWithInterstitialWithoutImage" class="item"
+      [class.active]="isSurveyWithInterstitialWithoutImage()">
+      <ng-container *ngTemplateOutlet="surveyCarouselItems"></ng-container>
+    </div>
+  </div>
+
+  <!-- Left and right controls -->
+  <a [attr.id]="carouselRefId + 'ContentCarouselPrev'" class="left carousel-control" data-slide="prev"
+    [attr.href]="'#' + carouselRefId + 'ContentCarousel'" (click)="stopGif()">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a [attr.id]="carouselRefId + 'ContentCarouselNext'" class="right carousel-control" data-slide="next"
+    [attr.href]="'#' + carouselRefId + 'ContentCarousel'" (click)="stopGif()">
+    <span class="glyphicon glyphicon-chevron-right"></span>
+    <span class="sr-only">Next</span>
+  </a>
+
+</div>
+
+<ng-template #vasCarouselItems>
+  <div *ngIf="campaign.vasInfo && campaign.vasInfo.providerId !== null" class="item">
+    <div class="item-col">
+      <div class="iu-subscribe-popup-panel">
+        <div class="iu-subscribe-box">
+          <h3>{{ campaign.vasInfo.preSubscriptionTitle }}</h3>
+          <p>{{ campaign.vasInfo.preSubscriptionText }}</p>
+          <div class="iu-subs-action-box">
+            <button class="btn-no">{{ campaign.vasInfo.preSubscriptionNegativeText | uppercase }}</button>
+            <button class="btn-yes">{{ campaign.vasInfo.preSubscriptionPositiveText | uppercase }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Subscribe Popup</p>
+  </div>
+
+  <div *ngIf="campaign.vasInfo && campaign.vasInfo.providerId !== null" class="item">
+    <div class="item-col">
+      <div class="iu-subscribe-popup-panel">
+        <div class="iu-subscribe-box">
+          <h3>Service Activated</h3>
+          <div class="iu-subs-action-box">
+            <button class="btn-yes">{{ actionLabel }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Campaign Action</p>
+  </div>
+
+  <!-- <div *ngIf="campaign.vasInfo && campaign.vasInfo.providerId !== null" class="item">
+    <div class="item-col">
+      <div class="iu-subscribe-popup-panel">
+        <div class="iu-subscribe-box">
+          <h3>{{ campaign.vasInfo.defaultFailureText | capitalize }}</h3>
+          <div class="iu-subs-action-box">
+            <button class="btn-yes">{{ campaign.vasInfo.defaultActionText | uppercase }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>Campaign Failure</p>
+  </div>  -->
+</ng-template>
+
+<ng-template #surveyCarouselItems>
+  <div *ngIf="campaign.enableSurvey && campaign.survey !== null" class="item">
+    <div class="item-col">
+      <div class="position-relative">
+        <div class="mob-frame">
+          <div class="no-touch">
+            <i class="fa fa-times window_close"></i>
+            <h4>{{ campaign.survey?.title }}</h4>
+            <h6>{{ campaign.survey?.description }}</h6>
+            <div *ngFor="let question of campaign.survey.questions; index as i">
+
+              <form>
+                <div class="qs-row" *ngIf="question.answerType === 'SLIDER'">
+                  <label class="qus-text"><span>Question {{ i + 1 }}</span><br>{{ question.question }}</label>
+                  <p class="slider-count align-text-center">Selected Value: {{question.answerOptions[0] }} {{
+                    question.units !== null ? question.units : ''}}</p>
+                  <!-- <input type="range" [min]="question.answerOptions[0]" [max]="question.answerOptions[1]"
+                    [step]="question.answerOptions[2]" [value]="question.answerOptions[2]" class="form-control"> -->
+                  <mat-slider [min]="question.answerOptions[0]" [max]="question.answerOptions[1]"
+                    [value]="question.answerOptions[0]"></mat-slider>
+                  <div class="justify-text">
+                    <p class="slider-count ">{{ question.answerOptions[0] }} {{ question.units !== null ? question.units
+                      : ''}}</p>
+                    <p class="slider-count">{{question.answerOptions[1]}} {{ question.units !== null ? question.units :
+                      ''}}</p>
+                  </div>
+                </div>
+                <div class="qs-row" *ngIf="question.answerType === 'FREETEXT'">
+                  <label class="qus-text"><span>Question {{ i + 1 }}</span><br>{{ question.question }}</label>
+                  <input type="text"
+                    [value]="question.answerOptions !== null && question.answerOptions.length === 2 ? question.answerOptions[1] : ''"
+                    class="form-control text-area">
+                  <div class="info-text"> 140 <span>characters allowed</span>
+                  </div>
+                </div>
+                <div class="qs-row" *ngIf="question.answerType === 'RADIOBUTTON'">
+                  <label class="qus-text"><span>Question {{ i + 1 }}</span><br>{{ question.question }}</label>
+                  <div class="radio-container" *ngFor="let option of question.answerOptions">
+                    <label>
+                      <input type="radio" [value]="option" [checked]="question.answerOptions[0] === option"> {{ option
+                      }}
+                      <span class="checkmark"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="qs-row" *ngIf="question.answerType === 'CHECKBOX'">
+                  <label class="qus-text"><span>Question {{ i + 1 }}</span><br>{{ question.question }}</label>
+                  <div class="checkbox-container" *ngFor="let option of question.answerOptions">
+                    <label>
+                      <input type="checkbox" [value]="option" [checked]="question.answerOptions[0] === option"> {{
+                      option }}
+                      <span class="checkmark"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="qs-row drop-field" *ngIf="question.answerType === 'DROPDOWN'">
+                  <label class="qus-text"><span>Question {{ i + 1 }}</span><br>{{ question.question }}</label>
+                  <div class="select-custom-wrap" (click)=toggleDropdownDiv(i)>
+                    {{ question.answerOptions[0] }}
+                    <i class="fa fa-caret-down"></i>
+                    <div class="select-options" *ngIf="questionArray[i].showDiv">
+                      <ul>
+                        <li *ngFor="let option of question.answerOptions">{{ option }}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="btn-mob-bottom">
+              <button class="cancel" disabled> Cancel</button>
+              <button class="submit" disabled> submit</button>
+              <button class="terms-and-condition" disabled
+                *ngIf="campaign.survey?.termsAndConditions && campaign.survey?.termsAndConditions.length !== 0"> Terms &
+                <br />Condition</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

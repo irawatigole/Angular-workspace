@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { CapitalizePipe } from './capitalize.pipe';
 import { FileSizePipe } from './file-size.pipe';
 import { OrgFilterPipe } from './org-filter.pipe';
+import { OrderByPipe } from './orderBy.pipe';
+import { ClusterSearchPipe } from './cluster-search.pipe';
 @NgModule({
-  declarations: [CapitalizePipe, FileSizePipe, OrgFilterPipe],
+  declarations: [CapitalizePipe, FileSizePipe, OrgFilterPipe, OrderByPipe, ClusterSearchPipe],
   imports: [
     CommonModule,
     FormsModule
@@ -13,7 +15,9 @@ import { OrgFilterPipe } from './org-filter.pipe';
   exports: [
     CapitalizePipe,
     FileSizePipe,
-    OrgFilterPipe
+    OrgFilterPipe,
+    OrderByPipe,
+    ClusterSearchPipe
   ]
 })
 export class SharedHelperModule { }

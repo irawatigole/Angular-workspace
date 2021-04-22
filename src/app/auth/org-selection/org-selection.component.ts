@@ -40,7 +40,7 @@ export class OrgSelectionComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/campaign/manage';
+    this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/content/manage';
     if (localStorage.getItem('iup')) {
       this.router.navigate([this.returnUrl]);
     }

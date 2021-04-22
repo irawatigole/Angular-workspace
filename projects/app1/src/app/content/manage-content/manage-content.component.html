@@ -2,24 +2,18 @@
     <div class="row m-t iu-row">
       <div class="col-md-4 col-sm-6" style="padding-left: 0px;">
         <div class="input-group iu-user-srch">
-          <!-- <form [formGroup]="contentForm">
+          <form [formGroup]="contentForm">
             <input type="text" formControlName="searchText" class="form-control" placeholder="Search By Name" />
-          </form> -->
+          </form>
 
-          <!-- <div class="input-group-btn">
+          <div class="input-group-btn">
             <button type="button" class="btn">
               <i class="fa fa-search" aria-hidden="true"></i>
             </button>
-          </div> -->
+          </div>
         </div>
       </div>
       <div class="col-md-8 col-sm-6">
-        <!-- <button type="button" class="btn btn-primary" (click)="createImageContent()">
-          Create Image Content
-        </button>
-        <button type="button" class="btn btn-primary" (click)="createVideoContent()">
-          Create Video Content
-        </button> -->
         <div class="btn-group pull-right m-l">
           <button *ngIf="canCreateImageFlag || canCreateVideoFlag" [disabled]="contentLoading" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span >New Content</span> <span class="caret"></span>
@@ -113,11 +107,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let content of contentList; let i = index"
+                <tr *ngFor="let content of contentList | clusterSearch: searchText | orderBy: {property: column, direction: direction}; let i = index"
                   (click)="rowToggle($event)" [attr.data-index]="content.id">
                   <td>{{ content.name }}</td>
                   <td>{{ (['RICHNOTIFICATION_BIG','MAIN'].indexOf(content.imageContentType) === -1) ? content.imageContentType : (content.imageContentType === 'MAIN') ? 'PARTIAL' : 'RICH NOTIFICATION LARGE'}}</td>
-                  <td>{{ (content.imageContentType === 'VIDEO' && content.externalVideoUrl !== null) ? '' : content.size  }}</td>
+                  <td>{{ (content.imageContentType === 'VIDEO' && content.externalVideoUrl !== null) ? '' : content.size | fileSize }}</td>
                   <td>{{ (content.dimensions) ? content.dimensions.width + ' X ' + content.dimensions.height : '' }}</td>
                   <td>{{ content.createdDate | date }}</td>
                 </tr>
@@ -140,12 +134,47 @@
     <div id="detail-section" class="split split-horizontal">
       <div *ngIf="contentLoading" class="row">
         <div class="col-lg-12">
-          <iup-spinner></iup-spinner>
+          <lib-spinner></lib-spinner>
+        </div>
+      </div>
+      <div *ngIf="activeRow != null && !contentLoading" class="row m-b content-right-section">
+        <div class="col-lg-12">
+          <div class="content-top-section">
+            <div *ngIf="activeRow.imageContentType !== 'VIDEO'" class="content-image-top">
+              <img src="{{activeRow.imageContentType === 'GIF' ? activeRow.videoFileUrl
+              : activeRow.imageUrl}}" />
+            </div>
+            <div *ngIf="activeRow.imageContentType === 'VIDEO'" class="content-video-top">
+              <p class="text-muted" *ngIf="isUnSupportedVideo">Preview Not Supported</p>
+              <lib-spinner class="text-muted" *ngIf="(isSelectedVideoPlaying && !videoCanPlay) && !isUnSupportedVideo"></lib-spinner>
+              <video
+                id="selected-video-content"
+                title="click to play or pause"
+                controlsList="nodownload nofullscreen noremoteplayback"
+                (ended)="videoEnded()"
+                (click)="playAndPause($event)"
+                (canplay)="videoIsLoaded($event)">
+                <source src="{{ (activeRow.videoContentHostingType == 'IU') ? activeRow.videoFileUrl : activeRow.externalVideoUrl }}" type="video/mp4">
+              </video>
+              <div *ngIf="activeRow.imageContentType === 'VIDEO' && isSelectedVideoPlaying == false" class="iu-video-icon" style="top: 0;">
+                <a (click)="playSelectedVideo()" *ngIf="!isSelectedVideoPlaying">
+                  <i class="fa fa-play" aria-hidden="true"></i>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-12 mobile-preview">
+          <div class="mobile-preview-section" *ngIf="!contentLoading">
+            <lib-content-carousel
+              [campaign]="selectedCarouselData"
+              [videoContent]="selectedCarouselData.videoContent"></lib-content-carousel>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
 
 
 
