@@ -9,7 +9,6 @@ import { View2Component } from './view2/view2.component';
 import { NavComponent } from './nav/nav.component';
 import { LayoutsModule } from '../../../../src/app/common/layouts/layouts.module';
 import { AuthGuard } from '../../../../src/app/auth-doc/auth.guard';
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,8 +20,7 @@ import { AuthGuard } from '../../../../src/app/auth-doc/auth.guard';
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    LayoutsModule,
-
+    LayoutsModule
   ],
   providers: [AuthGuard],
   bootstrap: [AppComponent]

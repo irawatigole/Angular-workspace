@@ -13,6 +13,7 @@ import { AuthModule } from '../app/auth/auth.module';
 import { AuthInterceptor } from '../../projects/my-lib/src/lib/helper/auth.interceptor';
 import { ApiBaseService } from '../../projects/my-lib/src/lib/api-base-service';
 import { AuthGuard } from '../app/auth-doc/auth.guard';
+import { MyLibModule } from '../../projects/my-lib/src/lib/my-lib.module';
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,9 +28,10 @@ import { AuthGuard } from '../app/auth-doc/auth.guard';
     App1SharedModule.forRoot(),
     App2SharedModule.forRoot(),
     LayoutsModule,
-    AuthModule
+    AuthModule,
+    MyLibModule
   ],
-  providers: [ApiBaseService, AuthGuard, { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
+  providers: [AuthGuard, { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

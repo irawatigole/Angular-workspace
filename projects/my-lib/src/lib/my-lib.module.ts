@@ -5,10 +5,10 @@ import { SpinnerComponent } from './component/spinner/spinner.component'
 import { SharedHelperModule } from './helper/shared-helper.module';
 import { FileSizePipe } from './helper/file-size.pipe';
 @NgModule({
-  declarations: [MyLibComponent, SpinnerComponent],
+  declarations: [MyLibComponent],
   imports: [
   ],
-  exports: [MyLibComponent, ApiBaseService, SharedHelperModule],
+  exports: [MyLibComponent, SharedHelperModule],
   providers: [ApiBaseService]
 })
 export class MyLibModule { }
