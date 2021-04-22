@@ -11,9 +11,9 @@ import { LayoutsModule } from './common/layouts/layouts.module';
 import { NavComponent } from './nav/nav.component';
 import { AuthModule } from '../app/auth/auth.module';
 import { AuthInterceptor } from '../../projects/my-lib/src/lib/helper/auth.interceptor';
-import { ApiBaseService } from '../../projects/my-lib/src/lib/api-base-service';
 import { AuthGuard } from '../app/auth-doc/auth.guard';
 import { MyLibModule } from '../../projects/my-lib/src/lib/my-lib.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,7 +29,8 @@ import { MyLibModule } from '../../projects/my-lib/src/lib/my-lib.module';
     App2SharedModule.forRoot(),
     LayoutsModule,
     AuthModule,
-    MyLibModule
+    MyLibModule,
+    BrowserAnimationsModule
   ],
   providers: [AuthGuard, { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]

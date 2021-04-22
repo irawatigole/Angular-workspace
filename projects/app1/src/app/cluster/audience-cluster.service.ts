@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { ApiBaseService } from '../../../../my-lib/src/lib/api-base-service';
-// import { formatClusterCriteria } from '../../shared/helper/basic';
+import { formatClusterCriteria } from '../../../../my-lib/src/lib/helper/basic';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +20,18 @@ export class AudienceClusterService {
     return this.apiService.get('audienceclusters?filter=' + term + '&limit=' + limit);
   }
 
-//   getAudienceReachCount(collection: any, force: boolean = false): Observable<any> {
-//     const filters = 'filters=' + JSON.stringify(formatClusterCriteria(collection));
+  getAudienceReachCount(collection: any, force: boolean = false): Observable<any> {
+    const filters = 'filters=' + JSON.stringify(formatClusterCriteria(collection));
 
-//     return this.apiService.get('audienceclusters/reachcount?' + filters + '&forcecalculation=' + force);
-//   }
+    return this.apiService.get('audienceclusters/reachcount?' + filters + '&forcecalculation=' + force);
+  }
+
+  getNewAudienceReachCount(collection: any, force: boolean = false): Observable<any> {
+    const filters = 'filters=' + JSON.stringify(formatClusterCriteria(collection));
+
+    return this.apiService.get('audienceclusters/reachcount/new?' + filters + '&forcecalculation=' + force);
+  }
+
 
   getClusters(organizationId: string, placesConfigFlag: boolean = false, externalFlag: boolean = false)
   : Observable<any> {
@@ -64,5 +71,10 @@ export class AudienceClusterService {
 
   createExternalAudience(cluster: any): Observable<any> {
     return this.apiService.post('externalAudienceCluster', cluster);
+  }
+
+  uploadFile(formData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type-2': 'multipart/form-data' });
+    return this.apiService.postFile('files/upload/text', formData, headers);
   }
 }

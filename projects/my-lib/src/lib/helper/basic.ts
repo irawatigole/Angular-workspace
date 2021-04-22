@@ -1,3 +1,5 @@
+import { timeZonesDetails } from '../../../../../src/time-zone';
+
 export function sortByKey(collection: any[], key: string): any {
     return collection.sort((a, b) => {
       const x = a[key];
@@ -146,4 +148,45 @@ export function sortByKey(collection: any[], key: string): any {
     }
 
     return true;
+  }
+
+  export function convertDateByTimeZone(timezone: string): any {
+    // create Date object for current location
+    const dateObj = new Date();
+
+    // convert to UTC-0
+    dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
+
+    // convert to desire timezone using offset
+    dateObj.setMinutes(dateObj.getMinutes() + (getTimezoneOffset(timezone) * 60));
+
+    return dateObj;
+  }
+
+  export function getTimezoneOffset(timezone: string): any {
+    let offest = null;
+    for (const country of timeZonesDetails) {
+      for (const zone of country.zones) {
+        if (zone.java_code === timezone) {
+          offest = zone.utc_diff.substr(4);
+          // convert minutes to decimal, if minute exists
+          if (offest.indexOf('.') !== -1) {
+            const minute: any = offest.substr(offest.indexOf('.') + 1);
+            const hour = parseInt(offest.substr(0, offest.indexOf('.')), radix);
+            const decimal: any = minute / 60;
+            if (hour >= 0) {
+              offest = hour + decimal;
+            } else {
+              offest = hour - decimal;
+            }
+          }
+          break;
+        }
+      }
+      if (offest !== null) {
+        break;
+      }
+    }
+
+    return offest;
   }

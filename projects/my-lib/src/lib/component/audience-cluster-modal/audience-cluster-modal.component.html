@@ -1,0 +1,1221 @@
+<!-- CreateAudienceClusterModal -->
+<div class="modal fade" id="customAudienceClusterModal" role="dialog" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" (click)="modalClosed()">&times;</button>
+        <h4 class="modal-title" *ngIf="!isEdit && !isPlaceConfig && !isExternalCluster">Create Audience Cluster</h4>
+        <h4 class="modal-title" *ngIf="!isEdit && isPlaceConfig && !isExternalCluster">Create Place Config</h4>
+        <h4 class="modal-title" *ngIf="isEdit && isPlaceConfig && !isExternalCluster">Update Place Config</h4>
+        <h4 class="modal-title" *ngIf="isEdit && !isPlaceConfig && !isExternalCluster">Edit Audience Cluster</h4>
+        <h4 class="modal-title" *ngIf="!isEdit && !isPlaceConfig && isExternalCluster">Create External Audience Cluster</h4>
+        <h4 class="modal-title" *ngIf="isEdit && !isPlaceConfig && isExternalCluster">Edit External Audience Cluster</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="onSubmit()" [formGroup]="acForm" id="audienceClusterModalForm">
+            <div *ngIf="!isEdit && !isPlaceConfig && !isExternalCluster">
+              <div class="row justify-content-md-center">
+                  <div class="col-sm-4 mar-b10">
+                    <select formControlName="cluster_type" class="form-control">
+                      <option *ngFor="let option of clusterTypeList" [value]="option.id" [attr.selected]="(acForm.get('cluster_type')?.value === option.id) ? true : null" #clusterType>{{ option.name | capitalize }}</option>
+                    </select>
+                  </div>
+              </div>
+            </div>
+
+          <!-- <div *ngIf="!isEdit">
+            <div class="row" style="text-align: center;">
+              <div style="display: inline-block;">
+                <div class="btn-group btn-group-toggle pull-left iu-toggle-btn" data-toggle="buttons">
+                  <label class="btn btn-default" [class.active]="acForm.get('cluster_type').value === option.id" (click)="changeAppTopFilterCondition($event)" *ngFor="let option of clusterTypeList">
+                    <input type="radio" formControlName="cluster_type" [value]="option.id" [attr.checked]="(acForm.get('cluster_type').value === option.id) ? true : null">{{ option.name | capitalize }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- <div *ngIf="isEdit">
+            <div class="row" style="text-align: center;">
+              <div style="display: inline-block;">
+                <div class="btn-group btn-group-toggle pull-left iu-toggle-btn" data-toggle="buttons">
+                    <ng-container *ngFor="let option of clusterTypeList">
+                        <label class="btn btn-default"
+                          *ngIf="acForm.get('cluster_type').value === option.id"
+                          [class.active]="acForm.get('cluster_type').value === option.id"
+                          (click)="changeAppTopFilterCondition($event)">
+                          <input type="radio" formControlName="cluster_type" [value]="option.id" [attr.checked]="(acForm.get('cluster_type').value === option.id) ? true : null">{{ option.name | capitalize }}
+                        </label>
+                    </ng-container>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <!-- <div class="ibox-content">
+          </div> -->
+          <div class="ibox-title" style="border-width: 1px 0 0;" *ngIf="acForm.get('cluster_type')?.value === 'RULE'">
+            <h5>Primary Targeting Rules</h5>
+          </div>
+          <div class="ibox-content" *ngIf="acForm.get('cluster_type')?.value === 'RULE'">
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Visited<br />Locations</span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <div class="btn-group btn-group-toggle pull-left iu-toggle-btn ui-list-row">
+                      <span><strong>AND</strong></span>
+                      <label class="switch mar-rl-6">
+                        <input type="checkbox"
+                          formControlName="location_filter_top_condition" >
+                        <span class="slider round"></span>
+                      </label>
+                      <span><strong>OR</strong></span>
+                      <span class="iu-logic-text">Select appropriate logic operation between statements</span>
+                  </div>
+
+                  <div class="iu-add-link-wrapper pull-right">
+                    <!-- <a *ngIf="editLocationRuleIndex > -1" class="iu-add-link" (click)="editLocationRuleIndex = -1">+ Add New Rule</a> -->
+                  </div>
+                </div>
+                <div class="row" *ngIf="locationSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="row iu-row-wrapper iu-installed-apps-section" *ngIf="locationSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <div class="clearfix iu-edit-apps-box ui-list-row"
+                      [class.white-bg]="i === editLocationRuleIndex"
+                      *ngFor="let item of locationSelectionData.list; let i = index;">
+
+                      <span class="and-or" *ngIf="i > 0 && locationSelectionData.list.length > 1">
+                        <strong *ngIf="locationSelectionData.condition === 'ALL'">AND</strong>
+                        <strong *ngIf="locationSelectionData.condition !== 'ALL'">OR</strong>
+                      </span>
+
+                      <div class="iu-edit-apps-box"
+                        [class.iu-list-and-or-mar-l48]="i === 0 && locationSelectionData.list.length > 1"
+                        [class.iu-list-and-or-first]="i === 0"
+                        [class.iu-list-and-or-rest]="i > 0">
+
+                        <div class="pull-left iu-include-label">
+                          <span [class.exclude]="item['operation'] === 'EXCLUDE'">
+                            {{ item.operation | capitalize }}s
+                          </span>
+                          <span *ngIf="item.condition === 'ANY'">
+                            &nbsp;[OR]&nbsp;
+                          </span>
+                          <span *ngIf="item.condition === 'ALL'">
+                              &nbsp;[AND]&nbsp;
+                          </span>
+                        </div>
+
+                        <div class="pull-left iu-tag-display">
+                          <ul style="padding-left: 10px; list-style: none; color: #434345; font-weight: bold;">
+                            <li *ngFor="let loc of item.list">
+                              <span>
+                                {{ loc.location | capitalize }}
+                                <small class="count">{{ loc.count }}</small>
+                              </span>
+                              <span class="iu-hover-close">
+                                <i class="fa fa-times" (click)="removeLocationSelection(loc.id, i)"></i>
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+
+                        <div class="pull-right iu-action-icons iu-editing-option">
+                          <span *ngIf="i === editLocationRuleIndex"><i class="fa fa-save" (click)="editLocationRuleIndex = -1"></i></span>
+                          <span *ngIf="i === editLocationRuleIndex"><i class="fa fa-trash" (click)="removeLocationRule(i)"></i></span>
+                          <span *ngIf="i !== editLocationRuleIndex"><i class="fas fa-pencil-alt" (click)="editLocationSelection(i)"></i></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <select formControlName="location_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <select formControlName="location_filter_condition" class="form-control pull-left" style="width: 13%;">
+                    <option *ngFor="let option of fieldFilterCondition" [value]="option.id">{{ option.name }}</option>
+                  </select>
+                  <input type="text" [class.ng-invalid]="selectionError.locations != ''" placeholder="Search Location" class="form-control width-per-57" matInput formControlName="location" [matAutocomplete]="fieldAuto">
+                  <p *ngIf="progress.locationSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('location')?.value !== null">
+                      <span class="iu-warning-color" *ngIf="acForm.get('location')?.value.length !== 0 && progress.noLocationFlag">No data available for selected criteria</span>
+                  </p>
+                  <mat-autocomplete #fieldAuto="matAutocomplete" [displayWith]="displayLocation">
+                    <mat-option (onSelectionChange)="locationSelection($event, location)" *ngFor="let location of filteredLocations | async" [value]="location">
+                     <mat-checkbox [checked]="location.selected" (change)="toggleLocationSelection($event, location)" (click)="$event.stopPropagation()" >
+                      {{ location.location | capitalize }} <small class="count">{{ location.count }}</small>
+                    </mat-checkbox>
+                    </mat-option>
+                  </mat-autocomplete>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.locations">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Installed<br />Applications</span></p>
+              </div>
+
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <div class="btn-group btn-group-toggle pull-left iu-toggle-btn ui-list-row">
+                      <span><strong>AND</strong></span>
+                      <label class="switch mar-rl-6">
+                        <input type="checkbox"
+                          formControlName="installed_apps_filter_top_condition">
+                        <span class="slider round"></span>
+                      </label>
+                      <span><strong>OR</strong></span>
+                      <span class="iu-logic-text">Select appropriate logic operation between statements</span>
+                  </div>
+
+
+                  <!-- <div class="btn-group btn-group-toggle pull-left iu-toggle-btn" data-toggle="buttons">
+                    <label class="btn btn-default btn-sm"
+                      [class.active]="acForm.get('installed_apps_filter_top_condition').value === option"
+                      (click)="changeAppTopFilterCondition($event)"
+                      *ngFor="let option of fieldFilterCondition">
+                      <input type="radio" formControlName="installed_apps_filter_top_condition" [value]="option" [attr.checked]="(acForm.get('installed_apps_filter_top_condition').value === option) ? true : null">{{ option | capitalize }}
+                    </label>
+                  </div>    -->
+
+                  <div class="iu-add-link-wrapper pull-right">
+                    <!-- <a *ngIf="editInstalledAppRuleIndex > -1" class="iu-add-link" (click)="editInstalledAppRuleIndex = -1">+ Add New Rule</a> -->
+                  </div>
+                </div>
+                <div class="row" *ngIf="appSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="row iu-row-wrapper iu-installed-apps-section" *ngIf="appSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <div class="clearfix iu-edit-apps-box ui-list-row"
+                      [class.white-bg]="i === editInstalledAppRuleIndex"
+                      *ngFor="let item of appSelectionData.list; let i = index;">
+
+                      <span class="and-or" *ngIf="i > 0 && appSelectionData.list.length > 1">
+                        <strong *ngIf="appSelectionData.condition === 'ALL'">AND</strong>
+                        <strong *ngIf="appSelectionData.condition !== 'ALL'">OR</strong>
+                      </span>
+
+                      <div class="iu-edit-apps-box"
+                        [class.iu-list-and-or-mar-l48]="i === 0 && appSelectionData.list.length > 1"
+                        [class.iu-list-and-or-first]="i === 0"
+                        [class.iu-list-and-or-rest]="i > 0">
+
+                        <div class="pull-left iu-include-label">
+                          <span [class.exclude]="item['operation'] === 'EXCLUDE'">
+                            {{ item.operation | capitalize }}s
+                          </span>
+                          <span *ngIf="item.condition === 'ANY'">
+                            &nbsp;[OR]&nbsp;
+                          </span>
+                          <span *ngIf="item.condition === 'ALL'">
+                              &nbsp;[AND]&nbsp;
+                          </span>
+                        </div>
+
+                        <div class="pull-left iu-tag-display">
+                          <ul style="padding-left: 10px; list-style: none; color: #434345; font-weight: bold;">
+                            <li *ngFor="let app of item.list">
+                              <span>
+                                {{ app.appName }} - {{ app.packageName }}
+                                <small class="count">{{ app.count }}</small>
+                              </span>
+                              <span class="iu-hover-close">
+                                <i class="fa fa-times" (click)="removeAppSelection(app.id, i)"></i>
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+
+                        <div class="pull-right iu-action-icons iu-editing-option">
+                          <span *ngIf="i === editInstalledAppRuleIndex"><i class="fa fa-save" (click)="editInstalledAppRuleIndex = -1"></i></span>
+                          <span *ngIf="i === editInstalledAppRuleIndex"><i class="fa fa-trash" (click)="removeAppRule(i)"></i></span>
+                          <span *ngIf="i !== editInstalledAppRuleIndex"><i class="fas fa-pencil-alt" (click)="editAppSelection(i)"></i></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="installed_apps_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <select formControlName="installed_apps_filter_condition" class="form-control pull-left" style="width: 13%;">
+                    <option *ngFor="let option of fieldFilterCondition" [value]="option.id">{{ option.name }}</option>
+                  </select>
+                  <input type="text" [class.ng-invalid]="selectionError.installedApps != ''" placeholder="Search Installed Applications" matInput formControlName="installed_apps" class="form-control width-per-57" [matAutocomplete]="fieldAuto1">
+                  <p *ngIf="progress.installAppSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('installed_apps')?.value !== null">
+                    <span class="iu-warning-color" *ngIf="acForm.get('installed_apps')?.value?.length !== 0 && progress.noInstallAppFlag">No data available for selected criteria</span>
+                  </p>
+                  <mat-autocomplete #fieldAuto1="matAutocomplete">
+                    <mat-option (onSelectionChange)="appSelection($event, app)" *ngFor="let app of filteredApps | async" [value]="app">
+                      <mat-checkbox [checked]="app.selected" (change)="toggleAppSelection($event, app)" (click)="$event.stopPropagation()" >
+                      {{ app.appName }} - {{ app.packageName }} <small class="count">{{ app.count }}</small>
+                    </mat-checkbox>
+                    </mat-option>
+                  </mat-autocomplete>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.installedApps">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+
+
+            <!-- field start -->
+            <!-- <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2">
+                Businesses<br />/Places
+                <span matTooltip="Tooltip!" class="pull-right badge badge-primary font-italic">i</span>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of selectionData.include">
+                        <span>Includes</span>{{ item.name }} <i class="fa fa-times" (click)="removeIncludeSelection(item.id)"></i>
+                      </li>
+                    </ul>
+                    <ul class="iu-exclude-list">
+                      <li *ngFor="let item of selectionData.exclude">
+                        <span>Excludes</span>{{ item.name }} <i class="fa fa-times" (click)="removeExcludeSelection(item.id)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="business_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <input type="text" placeholder="location" formControlName="business" class="form-control" [matAutocomplete]="fieldAuto3">
+                  <mat-autocomplete #fieldAuto3="matAutocomplete">
+                    <mat-option *ngFor="let field of filteredFieldData" [value]="field">
+                      {{ field }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div> -->
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Device<br />Manufacturer<br />/Model</span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="makersSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="makersSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of makersSelectionData.list; let i = index;">
+                        <span [class.exclude]="item['operation'] === 'EXCLUDE'">{{ item['operation'] | capitalize }}s</span>{{ item['list'][0]['name'] }}{{ (item['list'][0]['scope'] == 'make') ? '*' : '' }} <small class="count">{{ item['list'][0]['count'] }}</small> <i class="fa fa-times" (click)="removeMakerSelection(item['list'][0]['id'], i)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="makers_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <input type="text" [class.ng-invalid]="selectionError.makers != ''"placeholder="Search Device Manufacturer/Model" matInput formControlName="makers" class="form-control" [matAutocomplete]="fieldAuto4">
+                  <p *ngIf="progress.modelSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('makers')?.value !== null">
+                    <span class="iu-warning-color" *ngIf="acForm.get('makers')?.value.length !== 0 && progress.noModelFlag">No data available for selected criteria</span>
+                  </p>
+                  <mat-autocomplete #fieldAuto4="matAutocomplete" [displayWith]="displayMaker">
+                    <mat-option (onSelectionChange)="makersSelection($event, make)" *ngFor="let make of filteredMakersData | async" [value]="make">
+                      <mat-checkbox [checked]="make.selected" (change)="toggleMakersSelection($event, make)" (click)="$event.stopPropagation()" >
+                      {{ make.name }} <small class="count">{{ make.count }}</small>
+                    </mat-checkbox>
+                    </mat-option>
+                  </mat-autocomplete>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.makers">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Operating<br />System</span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="osSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="osSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of osSelectionData.list; let i = index;">
+                        <span [class.exclude]="item['operation'] === 'EXCLUDE'">{{ item['operation'] | capitalize }}s</span>{{ item['list'][0]['name'] }} <small class="count">{{ item['list'][0]['count'] }}</small> <i class="fa fa-times" (click)="removeOSSelection(item['list'][0]['id'], i)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="operating_system_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <mat-form-field>
+                    <mat-select placeholder="Choose OS Version" formControlName="operating_system" class="form-control">
+                      <mat-option (onSelectionChange)="osSelection($event, os)" *ngFor="let os of osList" [value]="os.id">{{ os.name }} <small *ngIf="os?.count" class="count">{{ os?.count }}</small></mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.os">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Wireless<br />Operator </span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="wlOperatorSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="wlOperatorSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of wlOperatorSelectionData.list; let i = index;">
+                        <span [class.exclude]="item['operation'] === 'EXCLUDE'">{{ item['operation'] | capitalize }}s</span>{{ item['list'][0]['name'] }} <small class="count">{{ item['list'][0]['count'] }}</small> <i class="fa fa-times" (click)="removeWOSelection(item['list'][0]['id'], i)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="wireless_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <mat-form-field>
+                    <mat-select placeholder="Choose Wireless Operator" formControlName="wireless" class="form-control">
+                      <mat-option (onSelectionChange)="wlOperatorSelection($event, operator)" *ngFor="let operator of wlOperatorList" [value]="operator.id">{{ operator.name }} <small *ngIf="operator?.count" class="count">{{ operator?.count }}</small></mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.wlOperator">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Source<br />Package</span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="sourcePackageSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="sourcePackageSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of sourcePackageSelectionData.list; let i = index;">
+                        <span [class.exclude]="item['operation'] === 'EXCLUDE'">{{ item['operation'] | capitalize }}s</span>{{ item['list'][0]['name'] }} <small class="count">{{ item['list'][0]['count'] }}</small> <i class="fa fa-times" (click)="removeSourcePackageSelection(item['list'][0]['id'], i)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="sourcePackage_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <mat-form-field>
+                    <mat-select placeholder="Choose Source Package" formControlName="sourcePackages" class="form-control">
+                      <mat-option (onSelectionChange)="sourcePackageSelection($event, package)" *ngFor="let package of sourcePackageList" [value]="package.id">{{ package.name }} <small *ngIf="package?.count" class="count">{{ package?.count }}</small></mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.sourcePackage">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Device<br />Tier</span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="deviceTierSelectionData.list.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li><span>Includes</span> All Devices</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="deviceTierSelectionData.list.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of deviceTierSelectionData.list; let i = index;">
+                        <span [class.exclude]="item['operation'] === 'EXCLUDE'">{{ item['operation'] | capitalize }}s</span>{{ item['list'][0]['name'] }} <small class="count">{{ item['list'][0]['count'] }}</small> <i class="fa fa-times" (click)="removeDeviceTierSelection(item['list'][0]['id'], i)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="deviceTier_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <mat-form-field>
+                    <mat-select placeholder="Choose Device Tier" formControlName="deviceTier" class="form-control">
+                      <mat-option (onSelectionChange)="deviceTierSelection($event, tier)" *ngFor="let tier of deviceTierList" [value]="tier.id">{{ tier.name }} <small *ngIf="tier?.count" class="count">{{ tier.count }}</small></mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="alert-error">
+                    <div [hidden]="!selectionError.deviceTier">
+                      Invalid Selection Criteria
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- <div class="iu-hr-line"><span>OR</span></div> -->
+
+            <!-- field start -->
+            <div class="row m-b field-filter" *ngIf="acForm.get('cluster_type')?.value === 'CLIENTID' || acForm.get('cluster_type')?.value === 'PHONENUMBER'">
+              <div class="col-sm-3 col-md-2">
+                <p><span>Target<br />Devices </span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <select class="form-control pull-left">
+                    <option value="CLIENTID">Client ID</option>
+                    <option value="PHONENUMBER">Phone Number</option>
+                  </select>
+                  <input type="file" class="iu-input-upload" />
+                  <div class="alert-error">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+          </div>
+
+
+
+          <div class="ibox-title" style="border-width: 1px 0 0;" *ngIf="acForm.get('cluster_type')?.value === 'RULE'">
+            <h5>Supplemental Targeting Rules</h5>
+          </div>
+          <div class="ibox-content">
+            <p *ngIf="acForm.get('cluster_type')?.value === 'RULE'">The following data is not available for all people in the network. When data is available, it may be used to further supplement audience creation. When not available, these rules will not be considered.</p>
+
+            <!-- field start -->
+            <!-- <div class="row m-b">
+              <div class="col-sm-3 col-md-2">
+                Website<br />History
+                <span matTooltip="Tooltip!" class="pull-right badge badge-primary font-italic">i</span>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of selectionData.include">
+                        <span>Includes</span>{{ item.name }} <i class="fa fa-times" (click)="removeIncludeSelection(item.id)"></i>
+                      </li>
+                    </ul>
+                    <ul class="iu-exclude-list">
+                      <li *ngFor="let item of selectionData.exclude">
+                        <span>Excludes</span>{{ item.name }} <i class="fa fa-times" (click)="removeExcludeSelection(item.id)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <select formControlName="web_history_filter" class="form-control pull-left">
+                    <option *ngFor="let option of fieldFilter" [value]="option">{{ option | capitalize }}</option>
+                  </select>
+                  <input type="text" placeholder="location" formControlName="web_history" class="form-control" [matAutocomplete]="fieldAuto7">
+                  <mat-autocomplete #fieldAuto7="matAutocomplete">
+                    <mat-option *ngFor="let field of filteredFieldData" [value]="field">
+                      {{ field }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div> -->
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'RULE'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Gender </span></p>
+              </div>
+              <div class="col-sm-9 col-md-10 mar-t7">
+                <div class="row">
+
+                  <label class="radio-inline" *ngFor="let gender of genders">
+                    <input type="radio" formControlName="gender" [value]="gender" >
+                    &nbsp; {{ gender | capitalize }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b age-filter" *ngIf="acForm.get('cluster_type')?.value === 'RULE'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p><span>Age </span></p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <select formControlName="age_from" class="pull-left form-control">
+                    <option *ngFor="let number of ageFromArray" [value]="number">{{ number }}</option>
+                  </select>
+                  <div class="pull-left m-r-sm m-l-sm m-t-sm"> to </div>
+                  <select formControlName="age_to" class="pull-left form-control">
+                    <option *ngFor="let number of ageToArray" [value]="number">{{ number }}</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <div class="alert-error">
+                    <div [hidden]="!isAgeFilterError">Age start range should be less than end range</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'INTERESTINGLOCATIONS'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Type</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <label class="radio-inline">
+                  <input type="radio" formControlName="interestingLocationsType" value="FILE" />
+                    &nbsp; File
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" formControlName="interestingLocationsType" value="LIST" />
+                    &nbsp; List
+                </label>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'PHONENUMBER' || acForm.get('cluster_type')?.value === 'EXTERNAL_CLUSTER'">
+              <div class="col-sm-3 col-md-2 field-label">
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row iu-warning-color" *ngIf="orgSettings">
+                  Phone will be targeted at {{ this.isoIsdCodes[this.orgSettings.countryISOCode]['name'] }} region ( ISO Code: {{ this.orgSettings.countryISOCode }},  Country Dialling Code: {{ this.isoIsdCodes[this.orgSettings.countryISOCode]['isd_code'] }})
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'EXTERNAL_CLUSTER'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Select<br />Campaign</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="selectedExternalCampaign !== null">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li>
+                        {{ selectedExternalCampaign.name }} <i class="fa fa-times" (click)="removeExternalCampaignSelection()"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <input type="text" placeholder="Search External Campaign" class="form-control" matInput formControlName="exteralCampaign" [matAutocomplete]="fieldExternalCampaignAuto">
+                  <p *ngIf="progress.externalCampaignSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('exteralCampaign')?.value !== null">
+                    <span class="iu-warning-color" *ngIf="acForm.get('exteralCampaign')?.value.length !== 0 && progress.noExternalCampaignFlag">No data available for selected criteria</span>
+                  </p>
+                  <mat-autocomplete #fieldExternalCampaignAuto="matAutocomplete" [displayWith]="displayPlaceConfig">
+                    <mat-option (onSelectionChange)="externalCampaignSelection($event, campaign)" *ngFor="let campaign of filteredExternalCampaign | async" [value]="campaign">
+                    {{ campaign.name }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <div *ngIf="acForm.get('exteralCampaign')?.errors && (acForm.get('exteralCampaign')?.dirty || acForm.get('exteralCampaign')?.touched)" class="alert-error">
+                    <div *ngIf="acForm.get('exteralCampaign')?.errors?.required && selectedPlaceConfig === null">
+                      Campaign is a required field
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'EXTERNAL_CLUSTER'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Execution<br />Time</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" style="width: 20%">
+                  <input
+                    formControlName="executionTime"
+                    [owlDateTimeTrigger]="dt1"
+                    [owlDateTime]="dt1"
+                    [min]="'01:00'"
+                    [max]="'12:59'">
+                  <owl-date-time #dt1
+                    [pickerType]="'timer'"
+                    [hour12Timer]="true"
+                    [dateFormat]="'hh:mm A'"
+                    placeHolder="'hh:mm aa'">
+                  </owl-date-time>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="['EXTERNAL_CLUSTER','CLIENTID','PHONENUMBER'].indexOf(acForm.get('cluster_type')?.value) !== -1 || (acForm.get('cluster_type')?.value === 'INTERESTINGLOCATIONS' && acForm.get('interestingLocationsType')?.value === 'FILE')">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span *ngIf="acForm.get('cluster_type')?.value === 'CLIENTID'">Target By <br> Client IDs</span>
+                  <span *ngIf="acForm.get('cluster_type')?.value === 'INTERESTINGLOCATIONS' && acForm.get('interestingLocationsType')?.value === 'FILE'">Lat/Lng file</span>
+                  <span *ngIf="['EXTERNAL_CLUSTER','PHONENUMBER'].indexOf(acForm.get('cluster_type')?.value) !== -1">Target By <br> Phone Numbers</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row iu-warning-color mar-b10" *ngIf="acForm.get('cluster_type')?.value === 'EXTERNAL_CLUSTER'">
+                  Note: The file content should be in the format: ddmmyyyy,phoneNumber
+                </div>
+                <div class="row" *ngIf="uploadedFileDetails">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li>
+                        {{ uploadedFileDetails.fileName }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <input id="clientTargetFile" (change)="uploadTargetFileChange($event)" #clientTargetFile class="form-control" type="file" placeholder="Choose File" accept="text/csv,application/csv,text/x-comma-separated-values,text/comma-separated-values,application/octet-stream,application/vnd.ms-excel,application/excel,application/vnd.msexcel,.csv,.txt" />
+                </div>
+                <div class="row alert-error">
+                  <div *ngIf="isFileUploadError">{{ fileUploadErrorTxt }}</div>
+                </div>
+                <div class="row iu-file-progress">
+                  <div class="iu-progress-text-section">
+                    <iup-loading *ngIf="isFileUploadProgress"></iup-loading>
+                    <p class="iu-progress-text" *ngIf="uploadedPercentage > 0 && uploadedPercentage < 100">
+                      {{ this.uploadedPercentage }}% uploaded, please wait...
+                    </p>
+                    <p class="iu-progress-text" *ngIf="uploadedPercentage === 100 && isFileUploadProgress">
+                      please wait...
+                    </p>
+                  </div>
+                  <div class="iu-cancel-progress-section">
+                    <button *ngIf="isFileUploadProgress" type="button" class="btn btn-danger btn-sm btn-block" (click)="cancelFileUpload()">Cancel Upload</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="['EXTERNAL_CLUSTER','PHONENUMBER'].indexOf(acForm.get('cluster_type')?.value) !== -1 && (isFileSanitationProgress || fileSanitationData !== null)">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p *ngIf="fileSanitationData !== null && fileSanitationError === ''">
+                  <span>Few Records<br> from Attachment</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="isFileSanitationProgress">
+                  <div class="iu-progress-text-section">
+                    <iup-loading></iup-loading>
+                    <p class="iu-progress-text">File normalization is in-progress, please wait...</p>
+                  </div>
+                </div>
+                <div *ngIf="fileSanitationData !== null">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Before Normalization</th>
+                        <th>After Normalization</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of fileSanitationData">
+                        <td>{{ item.before }}</td>
+                        <td>{{ item.after }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div *ngIf="fileSanitationError" class="alert-error">{{ fileSanitationError }}</div>
+              </div>
+            </div>
+            <!-- field end -->
+
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'PERMISSION'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Target By <br> Permissions </span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <table class="table">
+                  <tr *ngFor="let permission of permissionList">
+                    <td>{{ permission.name }}</td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ permission.id }}" [checked]="permission.value === 'YES'" [value]="'YES'"> Yes
+                      </label>
+                    </td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ permission.id }}" [checked]="permission.value === 'NO'" [value]="'NO'"> No
+                      </label>
+                    </td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ permission.id }}" [checked]="permission.value === 'IGNORE'" [value]="'IGNORE'"> Ignore
+                      </label>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="alert-error">
+                <div *ngIf="isFileUploadError">{{ fileUploadErrorTxt }}</div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'CAMPAIGN'">
+
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Select<br />Campaign </span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <div class="btn-group btn-group-toggle pull-left iu-toggle-btn ui-list-row">
+                      <span><strong>AND</strong></span>
+                      <label class="switch mar-rl-6">
+                        <input type="checkbox"
+                          formControlName="campaign_top_condition"
+                          [checked]="acForm.get('campaign_top_condition')?.value === 'any'">
+                        <span class="slider round"></span>
+                      </label>
+                      <span><strong>OR</strong></span>
+                  </div>
+                </div>
+                <div class="row" *ngIf="campaignSelectionData.length === 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li>No Campaign selected</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row" *ngIf="campaignSelectionData.length > 0">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li *ngFor="let item of campaignSelectionData">
+                        {{ item.campaignName }}
+                        <i class="fa fa-times" (click)="removeCampaignSelection(item.campaignId)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+                  <input type="text" placeholder="Search Campaign " matInput formControlName="campaign" class="form-control" [matAutocomplete]="campaignFieldAuto">
+                  <p *ngIf="progress.campaignSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('campaign')?.value !== null">
+                    <span class="iu-warning-color" *ngIf="acForm.get('campaign')?.value.length !== 0 && progress.noCampaignFlag">No data available for searched criteria</span>
+                  </p>
+                  <mat-autocomplete #campaignFieldAuto="matAutocomplete" [displayWith]="displayCampaign">
+                    <mat-option (onSelectionChange)="campaignSelection($event, campaign)" *ngFor="let campaign of filteredCampaign | async" [value]="campaign">
+                      <mat-checkbox [checked]="campaign.selected" (change)="toggleCampaignSelection($event, campaign)" (click)="$event.stopPropagation()" >
+                        {{ campaign.name }}
+                      </mat-checkbox>
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'CAMPAIGN'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Target By <br> Actions </span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <table class="table">
+                  <tr *ngFor="let action of actionList">
+                    <td>{{ action.name }}</td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ action.id }}" [checked]="action.value === 'YES'" [value]="'YES'"> Yes
+                      </label>
+                    </td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ action.id }}" [checked]="action.value === 'NO'" [value]="'NO'"> No
+                      </label>
+                    </td>
+                    <td>
+                      <label class="radio-inline">
+                        <input type="radio" formControlName="{{ action.id }}" [checked]="action.value === 'IGNORE'" [value]="'IGNORE'"> Ignore
+                      </label>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'INTERESTINGLOCATIONS' && acForm.get('interestingLocationsType')?.value === 'LIST'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Search <br>Geo Location</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <iup-geo-fence
+                  [selectedList]="acForm.get('geoLocations')?.value"
+                  [maxLocation]="100"
+                  (getGeoFence)="getGeoFenceList($event)">
+                </iup-geo-fence>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'INTERESTINGLOCATIONS'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Radius</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <input type="number" min="0" max="10000" step="1" formControlName="geoRadius"> meters
+
+                  <div *ngIf="acForm.get('geoRadius')?.errors && (acForm.get('geoRadius')?.dirty || acForm.get('geoRadius')?.touched)" class="alert-error">
+                    <div *ngIf="acForm.get('geoRadius')?.errors?.required">
+                      Radius is a required field
+                    </div>
+                    <div *ngIf="acForm.get('geoRadius')?.errors?.min">
+                      Minimum Radius starts from 0
+                    </div>
+                    <div *ngIf="acForm.get('geoRadius')?.errors?.max">
+                      Radius should not be greater than 10,000
+                    </div>
+                    <div *ngIf="acForm.get('geoRadius')?.errors?.pattern">
+                      Radius should not have a decimal
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'ILCAMPAIGNCLUSTER'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Places<br />Config</span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row" *ngIf="selectedPlaceConfig !== null">
+                  <div class="iu-selection-wrapper">
+                    <ul class="iu-include-list">
+                      <li>
+                        {{ selectedPlaceConfig.name }} <i class="fa fa-times" (click)="removePlaceConfigSelection()"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="row">
+
+                  <input type="text" placeholder="Search Places Config" class="form-control" matInput formControlName="placeConfig" [matAutocomplete]="fieldPlaceConfigAuto">
+                  <p *ngIf="progress.placeConfigSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+                  <p *ngIf="acForm.get('placeConfig')?.value !== null">
+                    <span class="iu-warning-color" *ngIf="acForm.get('placeConfig')?.value?.length !== 0 && progress.noPlaceConfigFlag">No data available for selected criteria</span>
+                  </p>
+                  <mat-autocomplete #fieldPlaceConfigAuto="matAutocomplete" [displayWith]="displayPlaceConfig">
+                    <mat-option (onSelectionChange)="placeConfigSelection($event, config)" *ngFor="let config of filteredPlaceConfig | async" [value]="config">
+                    {{ config.name }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <div *ngIf="acForm.get('placeConfig')?.errors && (acForm.get('placeConfig')?.dirty || acForm.get('placeConfig')?.touched)" class="alert-error">
+                    <div *ngIf="acForm.get('placeConfig')?.errors?.required && selectedPlaceConfig === null">
+                      Place config is a required field
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+            <!-- field end -->
+
+            <!-- field start -->
+            <div class="row m-b" *ngIf="acForm.get('cluster_type')?.value === 'ILCAMPAIGNCLUSTER'">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p class="date-field-label">
+                  <span class="iu-required-star">*</span>
+                  <span>Start Date</span>
+                </p>
+                <p class="date-field-label">
+                  <span class="iu-required-star">*</span>
+                  <span>End Date</span>
+                </p>
+              </div>
+              <div class="col-sm-4 col-md-2">
+                <div class="row mar-b10">
+                  <input
+                    formControlName="startDate"
+                    [owlDateTimeTrigger]="dt2"
+                    [owlDateTime]="dt2"
+                    [max]="acForm.controls['endDate'].value"
+                  >
+                  <owl-date-time #dt2
+                    [autoClose]="true"
+                    [defaultMoment]="clusterStartDate"
+                    [inputId]="'start_date'"
+                    [dateFormat]="'YYYY/MM/DD'"
+                    [pickerType]="'calendar'"
+                    [placeHolder]="''"
+                    [locale]="locale">
+                  </owl-date-time>
+                </div>
+                <div class="row">
+                  <input
+                    formControlName="endDate"
+                    [owlDateTimeTrigger]="dt3"
+                    [owlDateTime]="dt3"
+                    [min]="clusterStartDate">
+                  <owl-date-time #dt3
+                    [autoClose]="true"
+                    [defaultMoment]="clusterStartDate"
+                    [inputId]="'end_date'"
+                    [dateFormat]="'YYYY/MM/DD'"
+                    [pickerType]="'calendar'"
+                    [placeHolder]="''"
+                    [locale]="locale">
+                  </owl-date-time>
+                </div>
+              </div>
+              <div class="col-sm-5 col-md-8">
+                <!-- [existingTimeSlots]="distributionTimeSlots" -->
+                <iup-time-slot
+                  [startDate]="acForm.get('startDate')?.value"
+                  [endDate]="acForm.get('endDate')?.value"
+                  [executionPlan]="[]"
+                  (selectedTimeSlots)="getTimeSlots($event)">
+                  <p class="text-danger" *ngIf="timeSlots.length === 0">At least 1 time slot is required</p>
+                </iup-time-slot>
+              </div>
+            </div>
+            <!-- field end -->
+
+            <hr />
+
+            <!-- field start -->
+            <div class="row m-b">
+              <div class="col-sm-3 col-md-2 field-label">
+                <p>
+                  <span class="iu-required-star">*</span>
+                  <span>Audience <br> Name </span>
+                </p>
+              </div>
+              <div class="col-sm-9 col-md-10">
+                <div class="row">
+                  <input formControlName="name" class="form-control" type="text" placeholder="Audience Cluster Name" [readonly]="isEdit"/>
+                  <p *ngIf="!isEdit && progress.nameSearchFlag" class="iu-loading-note iu-loading-dots">Checking, please wait</p>
+
+                  <div class="alert-error" *ngIf="!isEdit && acForm.get('name')?.errors && (acForm.get('name')?.dirty || acForm.get('name')?.touched)">
+                    <div [hidden]="!acForm.get('name')?.errors?.required">Audience Cluster name is a required field</div>
+                  </div>
+                  <div class="alert-error" *ngIf="!isEdit && acForm.get('name')?.errors && (acForm.get('name')?.dirty || acForm.get('name')?.touched)">
+                    <div *ngIf="!acForm.get('name')?.errors?.required && acForm.get('name')?.errors?.pattern">Audience Cluster name is not valid</div>
+                  </div>
+                  <div class="alert-error" *ngIf="!isEdit" [hidden]="uniqueNameLoading || acForm.controls['name']?.value.length === 0">
+                    <div [hidden]="isUniqueName">Name already used for Audience Cluster, please choose different name</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- field end -->
+
+          </div>
+        </form>
+        <div class="alert-error" style="text-align: center;">{{ errorMessage }}</div>
+        <div class="iu-warning-color" style="text-align: center;">{{ warningMessage }}</div>
+      </div>
+      <div class="modal-footer">
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'RULE'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit"
+            [disabled]="this.acForm.controls['name'].value.length === 0
+              || uniqueNameLoading
+              || clusterName.length == 0
+              || isUniqueName != true
+              || loading
+              || selectionError.locations != ''
+              || selectionError.makers != ''
+              || selectionError.installedApps != ''
+              || selectionError.os != ''
+              || selectionError.wlOperator != ''
+              || selectionError.sourcePackage != ''
+              || selectionError.deviceTier != ''
+              || acForm.controls['name'].invalid
+              || isAgeFilterError
+              || ((this.acForm.controls['cluster_type'].value === 'CLIENTID'
+              || this.acForm.controls['cluster_type'].value === 'PHONENUMBER')
+              && (this.acForm.controls['cluster_file'].value.length === 0))"
+            class="btn iu-btn btn-primary" type="submit"
+            form="audienceClusterModalForm">
+            Create Audience Cluster
+          </button>
+          <button *ngIf="isEdit" [disabled]="acForm.controls['name'].value.length === 0 || loading || selectionError.locations != '' || selectionError.makers != '' || selectionError.installedApps != '' || selectionError.os != '' || selectionError.wlOperator != '' || selectionError.sourcePackage != '' ||   isAgeFilterError || ((this.acForm.controls['cluster_type'].value === 'CLIENTID' || this.acForm.controls['cluster_type'].value === 'PHONENUMBER') && (this.acForm.controls['cluster_file'].value.length === 0))" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'CLIENTID'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+          <button *ngIf="isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || loading" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'PERMISSION'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+          <button *ngIf="isEdit" [disabled]="acForm.controls['name'].value.length === 0 || loading" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'CAMPAIGN'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="campaignSelectionData.length === 0 || acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+          <button *ngIf="isEdit" [disabled]="campaignSelectionData.length === 0 || acForm.controls['name'].value.length === 0 || loading" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'INTERESTINGLOCATIONS'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false || acForm.controls['geoRadius']?.errors || (acForm.controls['interestingLocationsType']?.value === 'LIST' && acForm.controls['geoLocations']?.value.length === 0) || (acForm.get('clusterFileObj')?.value === null && acForm.controls['interestingLocationsType']?.value === 'FILE')" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Place Config</button>
+          <button *ngIf="isEdit" [disabled]="acForm.controls['name']?.value.length === 0 || loading || acForm.controls['geoRadius']?.errors || (acForm.controls['interestingLocationsType']?.value === 'LIST' && acForm.controls['geoLocations']?.value.length === 0) || (acForm.get('clusterFileObj')?.value === null && acForm.controls['interestingLocationsType']?.value === 'FILE')" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Place Config</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'ILCAMPAIGNCLUSTER'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="selectedPlaceConfig === null || acForm.controls['name'].value.length === 0 || uniqueNameLoading || loading || isUniqueName === false || timeSlots.length === 0 || timeSlotErrorFlag" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'PHONENUMBER'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+          <button *ngIf="isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || loading" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+        <div *ngIf="this.acForm.controls['cluster_type'].value === 'EXTERNAL_CLUSTER'">
+          <button type="button" class="btn iu-btn btn-cancel" data-dismiss="modal" (click)="modalClosed()">Cancel</button>
+          <button *ngIf="!isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || uniqueNameLoading || loading || isUniqueName === false || selectedExternalCampaign === null || isFileUploadProgress" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Create Audience Cluster</button>
+          <button *ngIf="isEdit" [disabled]="acForm.get('clusterFileObj')?.value === null || acForm.controls['name']?.value.length === 0 || loading || selectedExternalCampaign === null || isFileUploadProgress || orgSettings === undefined" type="submit" form="audienceClusterModalForm" class="btn iu-btn btn-primary">Update Audience Cluster</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

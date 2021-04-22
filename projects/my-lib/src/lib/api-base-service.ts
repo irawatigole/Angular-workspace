@@ -70,6 +70,34 @@ export class ApiBaseService {
     );
   }
 
+  postFile(uriPath: string, data: any, headers: HttpHeaders | null = null): Observable<any> {
+    // if (this.isSessionExpired()) {
+    //   this.logoutSession();
+    //   return Observable.throw(this.createExpiryResponse());
+    // } else {
+    if (headers == null) {
+      headers = this.getHttpFileHeaders();
+    } else if (!headers.has('token')) {
+      headers = this.setHttpFileSessionToken(headers);
+    }
+
+    const req = new HttpRequest('POST', this.buildApiURL(uriPath), data, {
+      headers,
+      reportProgress: true
+    });
+
+    return this.httpClient.request(req).pipe(map(event => {
+      return event;
+    }), catchError((error: HttpErrorResponse) => {
+      return of(error);
+    }));
+    // }
+  }
+
+  private getHttpFileHeaders(): HttpHeaders {
+    return this.setHttpFileSessionToken(new HttpHeaders({ 'Content-Type': 'application/json', encoding: 'binary' }));
+  }
+
   private getHeaders(): HttpHeaders {
     return this.setSessionToken(new HttpHeaders({ 'Content-Type': 'application/json' }));
   }
@@ -79,6 +107,17 @@ export class ApiBaseService {
       || uriPath.indexOf('https://') !== -1
       || uriPath.indexOf('.') === 0
     ) ? uriPath : envConfig.apiDomain + uriPath;
+  }
+
+  private setHttpFileSessionToken(headers: HttpHeaders): HttpHeaders {
+    if (localStorage.getItem('iup') && this.cookieService.getCookie('t') !== null) {
+      headers.append(
+        'token',
+        this.cookieService.getCookie('t')
+        // JSON.parse(localStorage.getItem('iup'))['data']['token']
+      );
+    }
+    return headers;
   }
 
   private setSessionToken(headers: HttpHeaders): HttpHeaders {
