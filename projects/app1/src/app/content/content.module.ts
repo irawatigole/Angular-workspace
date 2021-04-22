@@ -7,7 +7,7 @@ import { ContentRoutingModule  } from './content.routing.module';
 import { ManageContentComponent } from './manage-content/manage-content.component';
 import { SharedHelperModule } from '../../../../my-lib/src/lib/helper/shared-helper.module';
 import { ContentService } from './content.service';
-
+import { SharedComponentModule } from '../../../../my-lib/src/lib/component/shared-component.module';
 @NgModule({
   declarations: [ManageContentComponent],
   imports: [
@@ -16,7 +16,8 @@ import { ContentService } from './content.service';
     ReactiveFormsModule,
     LayoutsModule,
     ContentRoutingModule,
-    SharedHelperModule
+    SharedHelperModule,
+    SharedComponentModule
   ],
   providers: [ContentService],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
